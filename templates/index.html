@@ -1,105 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulation Parameters</title>
+    <title>Simulation Form</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Simulation Parameters</h1>
-      <form id="simulationForm">
-        <div class="form-group">
-          <label for="databaseName">Database Name:</label>
-          <input type="text" id="databaseName" name="databaseName" />
-        </div>
-        <div class="form-group">
-          <label for="simulationName">Simulation Name:</label>
-          <input type="text" id="simulationName" name="simulationName" />
-        </div>
-        <div class="form-group">
-          <label for="databaseDirectory">Database Directory:</label>
-          <input type="text" id="databaseDirectory" name="databaseDirectory" />
-        </div>
-      </form>
-      <button onclick="startSimulation()">Start Simulation</button>
-      <div class="fetch-simulation">
-        <h2>Fetch Simulation Data</h2>
+    <form action="/run-simulation" method="post">
+      {% for key, value in default_params.items() %}
+      <div>
+        <label for="{{ key }}">{{ key }}</label>
         <input
-          type="text"
-          id="fetchSimulationId"
-          placeholder="Enter Simulation ID"
+          type="{{ 'number' if value is number else 'text' }}"
+          id="{{ key }}"
+          name="{{ key }}"
+          value="{{ value }}"
         />
-        <button onclick="fetchSimulationData()">Fetch Data</button>
       </div>
-      <div id="simulationDataDisplay">Simulation data will appear here.</div>
-    </div>
-
-    <script>
-      window.onload = function () {
-        fetch("/get-defaults")
-          .then((response) => response.json())
-          .then((data) => {
-            const form = document.getElementById("simulationForm");
-            Object.entries(data).forEach(([key, value]) => {
-              const label = document.createElement("label");
-              label.htmlFor = key;
-              label.innerText = key.replace(/_/g, " ") + ":";
-
-              const input = document.createElement("input");
-              input.type = "text";
-              input.id = key;
-              input.name = key;
-              input.placeholder = value;
-
-              form.appendChild(label);
-              form.appendChild(input);
-              form.appendChild(document.createElement("br"));
-            });
-          })
-          .catch((error) =>
-            console.error("Error loading default parameters:", error)
-          );
-      };
-      function startSimulation() {
-        const formData = new FormData(
-          document.getElementById("simulationForm")
-        );
-        const simulationParameters = {};
-        formData.forEach((value, key) => {
-          // Use the input's value if provided, otherwise fall back to the placeholder
-          const inputElement = document.getElementById(key);
-          simulationParameters[key] = value || inputElement.placeholder;
-        });
-
-        fetch("/new-simulation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ parameters: simulationParameters }),
-        })
-          .then((response) => response.json())
-          .then((data) =>
-            alert(
-              "Simulation started successfully. Simulation ID: " +
-                data.simulation_id
-            )
-          )
-          .catch((error) => console.error("Error:", error));
-      }
-      function fetchSimulationData() {
-        const simulationId = document.getElementById("fetchSimulationId").value;
-        fetch(`/simulation-details/${simulationId}`)
-          .then((response) => response.json())
-          .then((data) => {
-            document.getElementById("simulationDataDisplay").textContent =
-              JSON.stringify(data, null, 2);
-          })
-          .catch((error) => {
-            console.error("Error fetching simulation data:", error);
-            document.getElementById("simulationDataDisplay").textContent =
-              "Failed to fetch simulation data.";
-          });
-      }
-    </script>
+      {% endfor %}
+      <div>
+        <label for="directory">Directory Name:</label>
+        <input type="text" id="directory" name="directory" required />
+      </div>
+      <div>
+        <label for="database">Database Name:</label>
+        <input type="text" id="database" name="database" required />
+      </div>
+      <button type="submit">Run Simulation</button>
+    </form>
   </body>
 </html>

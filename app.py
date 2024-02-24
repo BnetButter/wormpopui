@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import subprocess
 import json
 import os
@@ -11,6 +11,11 @@ def form():
     with open('simulation/constants.json') as f:
         default_params = json.load(f)
     return render_template('index.html', default_params=default_params)
+
+# Route for serving files from the public directory
+@app.route('/<path:filename>')
+def public_files(filename):
+    return send_from_directory('public', filename)
 
 @app.route('/run-simulation', methods=['POST'])
 def run_simulation():

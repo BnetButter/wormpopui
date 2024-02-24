@@ -3,7 +3,9 @@
   <head>
     <title>Simulation Form</title>
   </head>
+  <link rel="stylesheet" href="/index.css"/>
   <body>
+    
     <form action="/run-simulation" method="post">
       {% for key, value in default_params.items() %}
       <div>
@@ -26,5 +28,8 @@
       </div>
       <button type="submit">Run Simulation</button>
     </form>
+    <div>
+      <a href="jobs.html">View Jobs</a>
+    </div>
   </body>
 </html>

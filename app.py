@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, redirect, jsonify
 import subprocess
 import json
 import os
 import uuid
 import sqlite3
 import signal
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -24,15 +25,12 @@ def public_files(filename):
 def run_simulation():
     parameters = request.form.to_dict()
     #directory_name = parameters.pop('directory')  uuid.uuid4()
-    
-    
-    
+        
     #os.mkdir("instances")
     guid = str(uuid.uuid4())
     #directory_name = "instances/" + guid
     #directory_name = os.path.join(os.getcwd(), directory_name)
-    parameters.pop('database')
-    parameters.pop('directory')
+    name = parameters.pop('name')
 
     directory_name = os.path.join(os.getcwd(), "instances", guid)
     database_name = os.path.join(directory_name, "database.sqlite")
@@ -57,14 +55,16 @@ def run_simulation():
             'python', 'simulation/wormpop.py',
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
-            '--directory=' + directory_name
+            '--directory=' + directory_name,
+            '--name=' + name
         ]
     elif(platform == 'posix'):
         command = [
             'python3', 'simulation/wormpop.py',
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
-            '--directory=' + directory_name
+            '--directory=' + directory_name,
+            '--name=' + name
         ]
     else:
         print("You did something very wrong!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -72,9 +72,10 @@ def run_simulation():
     print(os.name)
     print("----------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
+    child = None
     if os.name == 'posix':
         # Start the subprocess detached from its parent, running in a new process group
-        subprocess.Popen(command, 
+        child = subprocess.Popen(command, 
                          stdout=subprocess.DEVNULL, 
                          stderr=subprocess.STDOUT, 
                          stdin=subprocess.DEVNULL,
@@ -82,7 +83,7 @@ def run_simulation():
     # On Windows
     elif os.name == 'nt':
         # Start the subprocess detached from its parent and in a new console window
-        subprocess.Popen(command, 
+        child = subprocess.Popen(command, 
                          stdout=subprocess.DEVNULL, 
                          stderr=subprocess.STDOUT, 
                          stdin=subprocess.DEVNULL,
@@ -90,8 +91,25 @@ def run_simulation():
     else:
         raise RuntimeError("Unsupported operating system")
     
+    if not child:
+        raise RuntimeError("Shouldn't Happen")
 
+    # Get the PID of the child process
+    pid = child.pid
 
+    # Get the current time as start_time
+    start_time = datetime.now()
+
+    # Use a with statement to ensure the database connection is automatically managed
+    with sqlite3.connect('processtable.sqlite') as conn:
+        cursor = conn.cursor()
+
+        # Insert a new row into the ProcessTable with the pid, guid, and start_time
+        cursor.execute("INSERT INTO ProcessTable (pid, guid, start_time) VALUES (?, ?, ?)",
+                    (pid, guid, start_time))
+
+        # Commit the changes to the database
+        conn.commit()
 
     #stdout, stderr = process.communicate()
 
@@ -99,7 +117,78 @@ def run_simulation():
     #if stderr:
     #    response += f'<pre>Error: {stderr}</pre>'
     #return response
-    return "hello"
+
+    # redirect to the /jobs page
+    return redirect('/jobs.html')
+
+
+@app.route('/api/job-status')
+def job_status_all():
+    
+    # TODO implement pagination
+
+    with sqlite3.connect('processtable.sqlite') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM ProcessTable")
+        rows = cursor.fetchall()
+        results = []
+    
+        for row in rows:
+            pid, guid, start_time, _ = row
+            try:
+                # Try sending signal 0, this does not kill the process but checks if it's possible to send signals
+                os.kill(pid, 0)
+                status = 'RUNNING'
+            except OSError:
+                # If an error occurs, it means the process is stopped or doesn't exist
+                status = 'STOPPED'
+
+            # Calculate time elapsed since the start_time
+            start_time_obj = datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S.%f')  # Adjust the format if necessary
+            time_elapsed = datetime.now() - start_time_obj
+            time_elapsed_str = str(time_elapsed)  # Convert to string if you want in 'HH:MM:SS' format
+
+
+
+            results.append({
+                'guid': guid,
+                'start_time': start_time,
+                'time_elapsed': time_elapsed_str,
+                'status': status,
+                'name': None
+            })
+
+        return jsonify({'result': results})
+
+
+
+
+def get_name_of_simulation(guid):
+    db_file = os.path.join('instances', guid, 'database.sqlite')
+    
+
+
+@app.route('/job-status/<guid>')
+def job_status(guid):
+    with sqlite3.connect('processtable.sqlite') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM ProcessTable WHERE guid=?", (guid,))
+        row = cursor.fetchone()
+        if row is None:
+            return "No such job"
+        pid = row[0]
+
+    try:
+        os.kill(pid, 0)
+    except OSError as e:
+        if e.errno == 3:
+            return "Job has finished"
+        else:
+            return f"Error: {e}"
+    else:
+        return "Job is still running"
+
+
 
 
 
@@ -134,8 +223,20 @@ def kill_all_processes():
                 print(f"Error killing process {pid}: {e}")
 
 
+def print_all_processes():
+    # Use a with statement to ensure the database connection is automatically closed
+    with sqlite3.connect('processtable.sqlite') as conn:
+        cursor = conn.cursor()
+
+        # Select all pids from the ProcessTable
+        cursor.execute("SELECT * FROM ProcessTable")
+        processes = cursor.fetchall()
+
+        for process in processes:
+            print(process)
+
+
 if __name__ == '__main__':
-    
     with sqlite3.connect('processtable.sqlite') as conn:
         # Create the ProcessTable if it doesn't exist
         create_process_table(conn)

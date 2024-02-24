@@ -4,31 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Table</title>
-    <link rel="stylesheet" href="jobs.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <table>
-        <thead>
-            <tr>
-                <th>Job ID</th>
-                <th>Name</th>
-                <th>Start Time</th>
-                <th>Time Elapsed</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Example row -->
-            <tr>
-                <td>1</td>
-                <td>Example Job</td>
-                <td>2024-02-24 10:00</td>
-                <td>2 hours</td>
-                <td><button>Action</button></td>
-            </tr>
-            <!-- Add more rows here -->
-        </tbody>
-    </table>
-    <script src="jobs.js"></script>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <table class="min-w-full table-auto">
+            <thead class="bg-gray-800 text-white">
+                <tr>
+                    <th class="px-4 py-2">Job ID</th>
+                    <th class="px-4 py-2">Name</th>
+                    <th class="px-4 py-2">Start Time</th>
+                    <th class="px-4 py-2">Time Elapsed</th>
+                    <th class="px-4 py-2">Action</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white">
+                
+                <tr class="hover:bg-gray-100">
+                    <td class="border px-4 py-2">1</td>
+                    <td class="border px-4 py-2">Example Job</td>
+                    <td class="border px-4 py-2">2024-02-24 10:00</td>
+                    <td class="border px-4 py-2">2 hours</td>
+                    <td class="border px-4 py-2 justified-center">
+                        <button class="bg-red-500 hover:bg-red-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="JOB_ID">Stop</button>
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="JOB_ID">Delete</button>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+    <script src="/jobs.js"></script>
 </body>
 </html>

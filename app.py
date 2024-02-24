@@ -3,6 +3,9 @@ import subprocess
 import json
 import os
 import uuid
+import sqlite3
+import signal
+
 
 app = Flask(__name__)
 
@@ -36,7 +39,6 @@ def run_simulation():
 
     os.makedirs(directory_name)
 
-
     with open('simulation/constants.json') as f:
         types = json.load(f)
     for key, value in parameters.items():
@@ -69,7 +71,28 @@ def run_simulation():
     
     print(os.name)
     print("----------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=os.getcwd())
+
+    if os.name == 'posix':
+        # Start the subprocess detached from its parent, running in a new process group
+        subprocess.Popen(command, 
+                         stdout=subprocess.DEVNULL, 
+                         stderr=subprocess.STDOUT, 
+                         stdin=subprocess.DEVNULL,
+                         preexec_fn=os.setsid)
+    # On Windows
+    elif os.name == 'nt':
+        # Start the subprocess detached from its parent and in a new console window
+        subprocess.Popen(command, 
+                         stdout=subprocess.DEVNULL, 
+                         stderr=subprocess.STDOUT, 
+                         stdin=subprocess.DEVNULL,
+                         creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
+    else:
+        raise RuntimeError("Unsupported operating system")
+    
+
+
+
     #stdout, stderr = process.communicate()
 
     #response = f'<pre>{stdout}</pre>'
@@ -78,5 +101,42 @@ def run_simulation():
     #return response
     return "hello"
 
+
+
+# Function to create the ProcessTable
+def create_process_table(db_connection):
+    cursor = db_connection.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ProcessTable (
+            pid INTEGER PRIMARY KEY,
+            guid TEXT NOT NULL,
+            start_time DATETIME,
+            end_time DATETIME
+        )
+    ''')
+    db_connection.commit()
+
+def kill_all_processes():
+    # Use a with statement to ensure the database connection is automatically closed
+    with sqlite3.connect('processtable.sqlite') as conn:
+        cursor = conn.cursor()
+
+        # Select all pids from the ProcessTable
+        cursor.execute("SELECT pid FROM ProcessTable")
+        processes = cursor.fetchall()
+
+        for process in processes:
+            pid = process[0]
+            try:
+                # Send the SIGTERM signal to gracefully terminate the process
+                os.kill(pid, signal.SIGTERM)
+            except OSError as e:
+                print(f"Error killing process {pid}: {e}")
+
+
 if __name__ == '__main__':
+    
+    with sqlite3.connect('processtable.sqlite') as conn:
+        # Create the ProcessTable if it doesn't exist
+        create_process_table(conn)
     app.run(debug=True)

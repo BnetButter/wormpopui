@@ -148,14 +148,12 @@ def job_status_all():
             time_elapsed = datetime.now() - start_time_obj
             time_elapsed_str = str(time_elapsed)  # Convert to string if you want in 'HH:MM:SS' format
 
-
-
             results.append({
                 'guid': guid,
                 'start_time': start_time,
                 'time_elapsed': time_elapsed_str,
                 'status': status,
-                'name': None
+                'name': get_name_of_simulation(guid)
             })
 
         return jsonify({'result': results})
@@ -165,7 +163,15 @@ def job_status_all():
 
 def get_name_of_simulation(guid):
     db_file = os.path.join('instances', guid, 'database.sqlite')
+    with sqlite3.connect(db_file) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM Metadata")
+        name = cursor.fetchone()[0]
+    return name
+
     
+
+
 
 
 @app.route('/job-status/<guid>')

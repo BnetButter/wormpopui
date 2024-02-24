@@ -4,6 +4,8 @@
     <title>Simulation Form</title>
     <link rel="stylesheet" href="/index.css"/>
   </head>
+  
+ <button onclick="window.location.href='/public/jobs.html'">View Jobs</button>
   <body>
     <form action="/run-simulation" method="post" class="container">
       {% for key, value in default_params.items() %}
@@ -27,8 +29,5 @@
       </div>
       <button type="submit">Run Simulation</button>
     </form>
-    <div>
-      <a href="/public/jobs.html">View Jobs</a>
-    </div>
   </body>
 </html>

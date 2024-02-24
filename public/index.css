@@ -5,12 +5,14 @@ body {
     padding: 0;
     margin-left: 10%;
     margin-right: 50%;
+    margin-top:100px;
+    margin-bottom:100px;
 }
 
 .container {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
 }
 
 .container > div {
@@ -19,7 +21,9 @@ body {
 }
 
 label {
-    display: block;
+    display: inline-block;
+    text-align: left;
+    min-width: 400px;
     margin-bottom: 5px;
     margin-top: 10px;
     

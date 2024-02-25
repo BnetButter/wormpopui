@@ -56,7 +56,7 @@ def run_simulation():
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
             '--directory=' + directory_name,
-            '--name=' + name
+            
         ]
     elif(platform == 'posix'):
         command = [
@@ -64,7 +64,7 @@ def run_simulation():
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
             '--directory=' + directory_name,
-            '--name=' + name
+            
         ]
     else:
         print("You did something very wrong!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -105,8 +105,8 @@ def run_simulation():
         cursor = conn.cursor()
 
         # Insert a new row into the ProcessTable with the pid, guid, and start_time
-        cursor.execute("INSERT INTO ProcessTable (pid, guid, start_time) VALUES (?, ?, ?)",
-                    (pid, guid, start_time))
+        cursor.execute("INSERT INTO ProcessTable (pid, guid, name, start_time) VALUES (?, ?, ?, ?)",
+                    (pid, guid, name, start_time))
 
         # Commit the changes to the database
         conn.commit()
@@ -134,7 +134,7 @@ def job_status_all():
         results = []
     
         for row in rows:
-            pid, guid, start_time, _ = row
+            pid, guid, name, start_time, _ = row
             try:
                 # Try sending signal 0, this does not kill the process but checks if it's possible to send signals
                 os.kill(pid, 0)
@@ -153,24 +153,10 @@ def job_status_all():
                 'start_time': start_time,
                 'time_elapsed': time_elapsed_str,
                 'status': status,
-                'name': get_name_of_simulation(guid)
+                'name': name
             })
 
         return jsonify({'result': results})
-
-
-
-
-def get_name_of_simulation(guid):
-    db_file = os.path.join('instances', guid, 'database.sqlite')
-    with sqlite3.connect(db_file) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM Metadata")
-        name = cursor.fetchone()[0]
-    return name
-
-    
-
 
 
 
@@ -205,6 +191,7 @@ def create_process_table(db_connection):
         CREATE TABLE IF NOT EXISTS ProcessTable (
             pid INTEGER PRIMARY KEY,
             guid TEXT NOT NULL,
+            name TEXT,
             start_time DATETIME,
             end_time DATETIME
         )

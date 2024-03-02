@@ -20,7 +20,7 @@ body {
     flex-direction: row;
 }
 
-label {
+label { 
     display: inline-block;
     text-align: left;
     min-width: 400px;

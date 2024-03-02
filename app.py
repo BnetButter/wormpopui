@@ -181,6 +181,10 @@ def job_status(guid):
         return "Job is still running"
 
 
+@app.route('/api/data/<guid>/<file>')
+def simulation_file(guid, file):
+    directory_name = os.path.join(os.getcwd(), "instances", guid)
+    return send_from_directory(directory_name, file)
 
 
 

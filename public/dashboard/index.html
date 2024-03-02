@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Dashboard</title>
+    <link rel="stylesheet" href="./index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    
+    <div id="dashboard" data-bind="foreach: dashboardSummaries">
+        <div id="summary-table" class="container">
+            
+            <div data-bind="text: name"></div>
+
+            <div class="top-section">
+                <div class="left-section">
+                    <div class="left-left-container">
+                        <div class="simulation-selector" data-bind="foreach: simulationInstances">
+                            <div class="simulation-form">
+                                <label data-bind="text: name"></label>
+                                <input type="checkbox" data-bind="checked: selected"></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="left-right-container">
+                        <div class="attribute-selector">
+                            <!-- JOHN TODO CHANGE ME-->
+                            <div data-bind="foreach: attributeList">
+                                <div data-bind="text: sampleText"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="right-section">
+                    <div id="linePlot"></div>
+                </div>
+            </div>
+            <div class="bottom-section">
+                <!-- CHUBI TODO CHANGE ME-->
+                <div data-bind="foreach: paramsList">
+                    <div data-bind="text: sampleText"></div>
+                </div>
+                <!-- CHUBI END TODO  -->
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./index.js"></script>
+<script src="./attribute.js"></script>
+<script src="./graph.js"></script>
+<script src="./table.js"></script>
+</html>

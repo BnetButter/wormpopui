@@ -32,5 +32,20 @@ function updateJobsTable(jobs) {
         timeElapsedCell.textContent = job.time_elapsed;
         actionCell.innerHTML = `<button class="bg-red-500 hover:bg-red-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="${job.guid}">Stop</button>
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="${job.guid}">Delete</button>`;
+        
+        // Create the anchor element
+        const anchor = document.createElement('a');
+
+        // Set the href attribute, incorporating job.guid
+        anchor.href = `/digraph/index.html?guid=${job.guid}`;
+
+        // Optionally set the anchor text or HTML
+        anchor.textContent = 'View Graph'; // For text content
+        // OR anchor.innerHTML = '<svg>...</svg>'; // If you're adding an icon or HTML
+
+        // Append the anchor to the actionCell
+        actionCell.appendChild(anchor);
     });
+
+
 }

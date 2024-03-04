@@ -13,6 +13,15 @@ function DashBoardFileViewModel(name, filename) {
     self.paramsList = ko.observableArray()
     self.attributeList = ko.observableArray()
     self.selectedData = ko.observableArray()
+
+    self.updateSelectedData = ko.computed(function() {
+        var selectedAttributes = self.attributeList().filter(function(attr) {
+            return attr.selected();
+        }).map(function(attr) {
+            return attr.sampleText;
+        });
+        self.selectedData(selectedAttributes);
+    });
     
 }
 

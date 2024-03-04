@@ -26,12 +26,15 @@
                         </div>
                     </div>
                     <div class="left-right-container">
-                        <div class="attribute-selector">
-                            <!-- JOHN TODO CHANGE ME-->
+                        <div class="attribute-selector">                     
                             <div data-bind="foreach: attributeList">
-                                <div data-bind="text: sampleText"></div>
+                                <label class="attribute-item">
+                                    <input type="checkbox" data-bind="checked: selected" />
+                                    <span data-bind="text: sampleText"></span>
+                                </label>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
                 <div class="right-section">

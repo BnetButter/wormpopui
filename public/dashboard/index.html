@@ -40,10 +40,12 @@
             </div>
             <div class="bottom-section">
                 <!-- CHUBI TODO CHANGE ME-->
-                <div data-bind="foreach: paramsList">
+                <div class="bottom-section" data-bind="foreach: paramsList">
                     <div data-bind="text: sampleText"></div>
+                    <script>
+                        table_Main($data, $data.selectedSimulationInstance());
+                    </script>
                 </div>
-                <!-- CHUBI END TODO  -->
             </div>
         </div>
     </div>

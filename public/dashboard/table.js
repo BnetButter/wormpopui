@@ -6,23 +6,44 @@ function table_ParamsModel(sampleText) {
 
 /* This function gets run every time a new simulation instance is clicked */
 function table_Main(dashboardFileViewModel, selectedSimulationInstance) {
-    
-    /* EDIT ME */
-    console.log(
-        dashboardFileViewModel.filename, 
-        selectedSimulationInstance.name,
-        selectedSimulationInstance.selected()
-    );
+    let guid = selectedSimulationInstance.guid;
+    console.log(guid);
 
-    /* 
-    TODO - Pull parameters.json for each simulation instance.
-    Create a table that shows how they differ */
-    
-    dashboardFileViewModel.paramsList(
-        dashboardFileViewModel.simulationInstances()
-            .filter(instance => instance.selected())
-            .map(instance => new table_ParamsModel(instance.name))
-    )
+    // Fetch parameters.json 
+    fetch(`/api/data/${guid}/parameters.json`)
+        .then(response => response.json())
+        .then(obj => {
+            console.log(obj); // log fetched parameters
+            updateTable(obj); // Call function to update the table
+        })
+}
+
+function updateTable(data) {
+    var table = document.getElementById('comparisonTable');
+    if (!table) {
+        table = document.createElement('table');
+        table.id = 'comparisonTable';
+        document.body.appendChild(table); // Add the table to the body or another container
+    }
+
+    // Clear table
+    table.innerHTML = '';
+
+    // Table headers
+    var thead = document.createElement('thead');
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<th>Parameter</th><th>Value</th>';
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    // Table body
+    var tbody = document.createElement('tbody');
+    for (var key in data) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = `<td>${key}</td><td>${data[key]}</td>`;
+        tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
 }
 
 /* --- DO NOT EDIT BELOW --- */

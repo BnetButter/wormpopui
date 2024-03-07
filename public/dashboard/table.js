@@ -1,8 +1,9 @@
-function table_ParamsModel(sampleText) {
+function table_ParamsModel(sampleText, data) {
     var self = this;
     self.sampleText = sampleText;
+    self.sampleData = data;
+    self.selected = ko.observable(false);
 }
-
 
 /* This function gets run every time a new simulation instance is clicked */
 function table_Main(dashboardFileViewModel, selectedSimulationInstance) {
@@ -14,37 +15,16 @@ function table_Main(dashboardFileViewModel, selectedSimulationInstance) {
         .then(response => response.json())
         .then(obj => {
             console.log(obj); // log fetched parameters
-            updateTable(obj); // Call function to update the table
+
+
+            dashboardFileViewModel.paramsList(
+                Object.keys(obj).map(k => new table_ParamsModel(k, obj[k]))
+            )
         })
+
 }
 
-function updateTable(data) {
-    var table = document.getElementById('comparisonTable');
-    if (!table) {
-        table = document.createElement('table');
-        table.id = 'comparisonTable';
-        document.body.appendChild(table); // Add the table to the body or another container
-    }
 
-    // Clear table
-    table.innerHTML = '';
-
-    // Table headers
-    var thead = document.createElement('thead');
-    var tr = document.createElement('tr');
-    tr.innerHTML = '<th>Parameter</th><th>Value</th>';
-    thead.appendChild(tr);
-    table.appendChild(thead);
-
-    // Table body
-    var tbody = document.createElement('tbody');
-    for (var key in data) {
-        var tr = document.createElement('tr');
-        tr.innerHTML = `<td>${key}</td><td>${data[key]}</td>`;
-        tbody.appendChild(tr);
-    }
-    table.appendChild(tbody);
-}
 
 /* --- DO NOT EDIT BELOW --- */
 window.dashboard.dashboardSummaries.forEach(_fileviewmodel => {

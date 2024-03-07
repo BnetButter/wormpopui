@@ -38,14 +38,23 @@
                     <div id="linePlot"></div>
                 </div>
             </div>
-            <div class="bottom-section">
-                <!-- CHUBI TODO CHANGE ME-->
-                <div class="bottom-section" data-bind="foreach: paramsList">
-                    <div data-bind="text: sampleText"></div>
-                    <script>
-                        table_Main($data, $data.selectedSimulationInstance());
-                    </script>
-                </div>
+            <div class="bottom-section" style="display:block; overflow-x:auto">
+                <!-- TODO REPLACE WITH A TABLE -->
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter Name</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: paramsList">
+                        <!-- Dynamic Table Rows -->
+                        <tr data-bind="css: { selected: selected }">
+                            <td data-bind="text: sampleText"></td>
+                            <td data-bind="text: sampleData"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

@@ -45,7 +45,6 @@ body, html {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
     height:100%;
 
 }
@@ -57,6 +56,5 @@ body, html {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
 
 }

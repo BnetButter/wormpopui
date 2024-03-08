@@ -7,21 +7,21 @@
     <link rel="stylesheet" href="./index.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    
     <div id="dashboard" data-bind="foreach: dashboardSummaries">
-        <div id="summary-table" class="container">
-            
+        <div id="summary-table" class="container max-w-6xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-2xl">
             <div data-bind="text: name"></div>
-
             <div class="top-section">
                 <div class="left-section">
                     <div class="left-left-container">
-                        <div class="simulation-selector" data-bind="foreach: simulationInstances">
-                            <div class="simulation-form">
-                                <label data-bind="text: name"></label>
-                                <input type="checkbox" data-bind="checked: selected"></input>
+                        <div class="flex flex-col space-y-4" data-bind="foreach: simulationInstances">
+                            <div class="flex flex-col space-y-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" data-bind="checked: selected"></input>
+                                    <span class="text-gray-700" data-bind="text:name">Option 1</span>
+                                </label>
                             </div>
                         </div>
                     </div>

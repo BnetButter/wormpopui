@@ -13,6 +13,7 @@ body, html {
 .top-section {
     flex: 2;
     display: flex;
+    max-height: 66%;
 }
 
 .bottom-section {
@@ -37,16 +38,15 @@ body, html {
 .left-left-container {
     flex: 1;
     padding: 5px;
+    overflow: auto;
 }
 
 .attribute-selector {
-    flex: 1;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height:100%;
-
+    justify-content: space-around;
 }
 
 .simulation-selector {

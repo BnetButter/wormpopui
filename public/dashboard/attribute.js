@@ -1,30 +1,48 @@
 function attribute_AttributeModel(sampleText) {
     var self = this;
     self.sampleText = sampleText;
+    self.selected = ko.observable(false);
+
+    self.selected.subscribe(function(newValue) {
+        if (newValue === true) {
+            console.log("Selected attribute: ", self.sampleText);
+        }
+    });
 }
 
-/* This function gets run every time a new simulation instance is clicked */
+
+function fetchAndParseTSV(guid, dashboardFileViewModel) {
+    const tsvFilePath = `/api/data/${guid}/${dashboardFileViewModel.filename}`;
+
+    fetch(tsvFilePath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(tsvContent => {
+            const rows = tsvContent.trim().split('\n');
+            const headers = rows[0].split('\t');
+            
+            
+            dashboardFileViewModel.attributeList.removeAll();
+
+            headers.forEach(header => {
+                dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header));
+            });
+        })
+        .catch(error => {
+            console.error('Failed to fetch or parse the TSV file:', error);
+        });
+}
+
 function attribute_Main(dashboardFileViewModel, selectedSimulationInstance) {
-    console.log("ATTRIBUTE MAIN")
-
-    /*  TODO - Pull the TSV file specified by the dashboardViewModel and render all the columns. 
-    The difficult part is that the TSV file is not guaranteed to have the same columns for each simulation instance.
-    If a column is missing, it should be marked as 'red'
-
-    As a step 1, assume all of them are the same
-    */
-
-    dashboardFileViewModel.attributeList(
-        dashboardFileViewModel.simulationInstances()
-            .filter(instance => instance.selected())
-            .map(instance => new attribute_AttributeModel(instance.name))
-    )
-
-    /* Step 2: The view models data field */
-
-    dashboardFileViewModel.selectedData([ /* UPDATE ME */ ])
+    console.log("ATTRIBUTE MAIN");
+    const guid = selectedSimulationInstance.guid;
+    fetchAndParseTSV(guid, dashboardFileViewModel);
+    
 }
-
 /* --- DO NOT EDIT BELOW --- */
 window.dashboard.dashboardSummaries.forEach(_fileviewmodel => {
     _fileviewmodel.simulationInstances.subscribe(function (_simulationInstance) {

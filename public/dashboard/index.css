@@ -58,3 +58,12 @@ body, html {
     align-items: center;
 
 }
+.attribute-item {
+    display: flex;
+    align-items: center; /* Centers items vertically */
+    margin-bottom: 5px; /* Adds space between each attribute */
+}
+
+.attribute-item input[type="checkbox"] {
+    margin-right: 10px; /* Space between the checkbox and the text */
+}

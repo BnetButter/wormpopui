@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,32 +7,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Table</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
-        <table class="min-w-full table-auto">
+        <table class="min-w-full table-auto border-collapse">
             <thead class="bg-gray-800 text-white">
                 <tr>
-                    <th class="px-4 py-2">Job ID</th>
-                    <th class="px-4 py-2">Name</th>
-                    <th class="px-4 py-2">Start Time</th>
-                    <th class="px-4 py-2">Time Elapsed</th>
-                    <th class="px-4 py-2">Action</th>
+  
+                    <th class="border-2 px-4 py-2 text-center align-middle">Job ID</th>
+                    <th class="border-2 px-4 py-2 text-center align-middle">Name</th>
+                    <th class="border-2 px-4 py-2 text-center align-middle">Start Time</th>
+                    <th class="border-2 px-4 py-2 text-center align-middle">Time Elapsed</th>
+                    <th class="border-2 px-4 py-2 text-center align-middle">Status</th>
+                    <th class="border-2 px-4 py-2 text-center align-middle">Action</th>
+
+
                 </tr>
             </thead>
-            <tbody class="bg-white">
-                
+            <tbody data-bind="foreach: jobs">
                 <tr class="hover:bg-gray-100">
-                    <td class="border px-4 py-2">1</td>
-                    <td class="border px-4 py-2 justified-center">
-                        <button class="bg-red-500 hover:bg-red-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="JOB_ID">Stop</button>
-                        <button class="bg-blue-500 hover:bg-blue-700 text-white mx-3 font-bold py-1 px-2 rounded" data-job-id="JOB_ID">Delete</button>
+                    <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: guid"></td>
+                    <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: name"></td>
+                    <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: start_time"></td>
+                    <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: time_elapsed"></td>
+                    <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: status, css: {'text-red-600': status === 'STOPPED', 'text-green-600': status !== 'STOPPED'}"></td>
+                    <td class="border-2 px-4 py-2 text-center align-middle">
+                        <button class="bg-red-500 hover:bg-red-700 text-white mx-1 font-bold py-1 px-2 rounded" data-bind="click: $parent.stopJob">Stop</button>
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white mx-1 font-bold py-1 px-2 rounded" data-bind="click: $parent.deleteJob">Delete</button>
+                        <button class="bg-green-500 hover:bg-green-700 text-white mx-1 font-bold py-1 px-2 rounded" data-bind="click: $parent.viewGraph">View Graph</button>
+                        <button class="bg-yellow-500 hover:bg-yellow-700 text-white mx-1 font-bold py-1 px-2 rounded" data-bind="click: $parent.downloadJob">Download</button>
                     </td>
                 </tr>
-                
             </tbody>
         </table>
     </div>
     <script src="/jobs.js"></script>
 </body>
 </html>
+

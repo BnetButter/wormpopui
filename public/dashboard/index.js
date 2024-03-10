@@ -3,6 +3,7 @@ function SelectedSimulationInstance(guid, name) {
     self.guid = guid;
     self.name = name;
     self.selected = ko.observable(false);
+    self.toggleSelected = () => {self.selected(!self.selected())}
 }
 
 function DashBoardFileViewModel(name, filename) {
@@ -22,7 +23,6 @@ function DashBoardFileViewModel(name, filename) {
         });
         self.selectedData(selectedAttributes);
     });
-    
 }
 
 function DashboardViewModel() {

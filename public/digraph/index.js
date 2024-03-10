@@ -155,7 +155,11 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
         setEdgeSize(larva_dauer_edge, "larva_to_dauer", timestep)
         setEdgeSize(dauer_larva_edge, "dauer_to_larva", timestep)
         setEdgeSize(adult_parlad_edge, "adult_to_bag", timestep)
+
+        setEdgeSize(adult_egg_edge, "adult_laid_egg", timestep)
+        setEdgeSize(parlad_dauer_edge, "parlad_to_dauer", timestep)
         
+      
         updateTimestep(timestep)
         timestep++
     }
@@ -183,7 +187,8 @@ function parseTransitionTSV(content2) {
     const desiredHeaders = [
         'egg_to_larva', 'egg_to_larva_mass', 'larva_to_adult', 'larva_to_adult_mass',
         'larva_to_dauer', 'larva_to_dauer_mass', 'adult_to_bag', 'adult_to_bag_mass',
-        'dauer_to_larva', 'darva_to_larva_mass'
+        'dauer_to_larva', 'darva_to_larva_mass', 
+        'adult_laid_egg', 'adult_laid_egg_mass', 'parlad_to_dauer', 'parlad_to_dauer_mass'
     ];
 
     // Create an object to store our data

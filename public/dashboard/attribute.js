@@ -1,15 +1,40 @@
-function attribute_AttributeModel(sampleText) {
+function attribute_AttributeModel(sampleText, data = []) {
     var self = this;
     self.sampleText = sampleText;
+    self.data = data;
     self.selected = ko.observable(false);
 
     self.selected.subscribe(function(newValue) {
         if (newValue === true) {
-            console.log("Selected attribute: ", self.sampleText);
+            console.log("Selected attribute: ", self.sampleText, "Data: ", self.data);
         }
     });
 }
 
+function parseTSV(tsvContent, dashboardFileViewModel) {
+    const rows = tsvContent.trim().split('\n');
+    const headers = rows[0].split('\t');
+    const dataRows = rows.slice(1); // Remove header row
+
+    let columnData = headers.reduce((acc, header) => {
+        acc[header] = [];
+        return acc;
+    }, {});
+
+    dataRows.forEach(row => {
+        const values = row.split('\t');
+        headers.forEach((header, index) => {
+            if (values[index] !== undefined) { // Check for undefined in case of missing data
+                columnData[header].push(values[index]);
+            }
+        });
+    });
+
+    dashboardFileViewModel.attributeList.removeAll();
+    headers.forEach(header => {
+        dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header, columnData[header]));
+    });
+}
 
 function fetchAndParseTSV(guid, dashboardFileViewModel) {
     const tsvFilePath = `/api/data/${guid}/${dashboardFileViewModel.filename}`;
@@ -22,15 +47,7 @@ function fetchAndParseTSV(guid, dashboardFileViewModel) {
             return response.text();
         })
         .then(tsvContent => {
-            const rows = tsvContent.trim().split('\n');
-            const headers = rows[0].split('\t');
-            
-            
-            dashboardFileViewModel.attributeList.removeAll();
-
-            headers.forEach(header => {
-                dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header));
-            });
+            parseTSV(tsvContent, dashboardFileViewModel);
         })
         .catch(error => {
             console.error('Failed to fetch or parse the TSV file:', error);
@@ -41,8 +58,8 @@ function attribute_Main(dashboardFileViewModel, selectedSimulationInstance) {
     console.log("ATTRIBUTE MAIN");
     const guid = selectedSimulationInstance.guid;
     fetchAndParseTSV(guid, dashboardFileViewModel);
-    
 }
+
 /* --- DO NOT EDIT BELOW --- */
 window.dashboard.dashboardSummaries.forEach(_fileviewmodel => {
     _fileviewmodel.simulationInstances.subscribe(function (_simulationInstance) {

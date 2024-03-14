@@ -1,24 +1,29 @@
-var trace1 = {
-x: [1, 2, 3, 4],
-y: [10, 15, 13, 17],
-type: 'scatter',  // this defines the type of plot, which is a line plot in this case
-mode: 'lines+markers', // this means the graph will have both lines and markers
-name: 'Sample Data'
-};
 
-var data = [trace1];
+// Function to update the graph with new data
+function updateGraph(timestepData, attributeData, attributeName) {
+    var trace = {
+        x: timestepData, // X-axis data from timestep data
+        y: attributeData, // Y-axis data from the selected attribute
+        type: 'scatter',  // Defines the type of plot, which is a line plot in this case
+        mode: 'lines+markers', // Graph will have both lines and markers
+        name: attributeName // Use the attribute name as the trace name
+    };
 
-var layout = {
-title: 'Simple Line Plot',
-xaxis: {
-    title: 'X Axis',
-    showgrid: false,
-    zeroline: false
-},
-yaxis: {
-    title: 'Y Axis',
-    showline: false
+    var data = [trace];
+
+    var layout = {
+        title: attributeName + ' vs. Time', // Dynamic title based on the selected attribute
+        xaxis: {
+            title: 'Time',
+            showgrid: false,
+            zeroline: false
+        },
+        yaxis: {
+            title: attributeName,
+            showline: false
+        }
+    };
+
+    // Render the plot to the div with id 'linePlot'
+    Plotly.newPlot('linePlot', data, layout);
 }
-};
-
-Plotly.newPlot('linePlot', data, layout);

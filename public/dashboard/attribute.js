@@ -1,12 +1,15 @@
-function attribute_AttributeModel(sampleText, data = []) {
+function attribute_AttributeModel(sampleText, data = [], dashboardFileViewModel) {
     var self = this;
     self.sampleText = sampleText;
     self.data = data;
+    self.dashboardFileViewModel = dashboardFileViewModel; // Store reference to the dashboardFileViewModel
     self.selected = ko.observable(false);
 
     self.selected.subscribe(function(newValue) {
         if (newValue === true) {
             console.log("Selected attribute: ", self.sampleText, "Data: ", self.data);
+            // Use the dashboardFileViewModel passed to this model to access timestepData
+            updateGraph(self.dashboardFileViewModel.timestepData, self.data, self.sampleText);
         }
     });
 }
@@ -21,18 +24,27 @@ function parseTSV(tsvContent, dashboardFileViewModel) {
         return acc;
     }, {});
 
+    let timestepData = []; // Array to hold timestep data
+
     dataRows.forEach(row => {
         const values = row.split('\t');
         headers.forEach((header, index) => {
             if (values[index] !== undefined) { // Check for undefined in case of missing data
-                columnData[header].push(values[index]);
+                if (header === "Timestep") { // Assuming 'Timestep' is the column header for timestep data
+                    timestepData.push(values[index]); // Store timestep data separately
+                } else {
+                    columnData[header].push(values[index]);
+                }
             }
         });
     });
 
+    dashboardFileViewModel.timestepData = timestepData; // Store timestep data in the dashboardFileViewModel
     dashboardFileViewModel.attributeList.removeAll();
     headers.forEach(header => {
-        dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header, columnData[header]));
+        if (header !== "Timestep") { // Exclude timestep column from attribute list
+            dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header, columnData[header], dashboardFileViewModel));
+        }
     });
 }
 

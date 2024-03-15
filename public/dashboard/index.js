@@ -1,43 +1,45 @@
-function SelectedSimulationInstance(guid, name) {
+function SelectedSimulationInstance(guid, name, dashboardViewModel) {
     const self = this;
     self.guid = guid;
     self.name = name;
     self.selected = ko.observable(false);
+    self.dashboardViewModel = dashboardViewModel;
 
     self.selected.subscribe(function(newValue) {
-        const index = selectedSimulations.indexOf(self.guid);
+        const index = self.dashboardViewModel.selectedSimulations.indexOf(self.guid);
         if (newValue) {
             if (index === -1) { // Ensure only adding if not present
-                selectedSimulations.push(self.guid);
+                self.dashboardViewModel.selectedSimulations.push(self.guid);
             }
         } else {
             if (index > -1) { // Ensure removing if present
-                selectedSimulations.splice(index, 1);
+                self.dashboardViewModel.selectedSimulations.splice(index, 1);
             }
         }
         
-        triggerGraphUpdate();
+        triggerGraphUpdate(self.dashboardViewModel);
     });
 
     self.toggleSelected = () => { self.selected(!self.selected()); }
 }
 
-function triggerGraphUpdate() {
-    if (currentlySelectedAttribute) {
+function triggerGraphUpdate(dashboardViewModel) {
+    if (dashboardViewModel.currentlySelectedAttribute) {
         // Re-filter and deduplicate based on updated selectedSimulations
-        updateGraphBasedOnSelections(currentlySelectedAttribute);
+        updateGraphBasedOnSelections(dashboardViewModel.currentlySelectedAttribute, dashboardViewModel);
     }
 }
 
-
 function DashBoardFileViewModel(name, filename) {
     const self = this;
-    self.name = name
-    self.filename = filename
-    self.simulationInstances = ko.observableArray()
-    self.paramsList = ko.observableArray()
-    self.attributeList = ko.observableArray()
-    self.selectedData = ko.observableArray()
+    self.name = name;
+    self.filename = filename;
+    self.simulationInstances = ko.observableArray();
+    self.paramsList = ko.observableArray();
+    self.attributeList = ko.observableArray();
+    self.selectedData = ko.observableArray();
+    self.currentlySelectedAttribute = null;
+    self.selectedSimulations = [];
 
     self.updateSelectedData = ko.computed(function() {
         var selectedAttributes = self.attributeList().filter(function(attr) {
@@ -62,17 +64,13 @@ function DashboardViewModel() {
     fetch('/api/job-status')
         .then(response => response.json())
         .then(data => {
-
             self.dashboardSummaries.forEach(fileviewmodel => {
                 fileviewmodel.simulationInstances(data.result.map(
-                    instance => new SelectedSimulationInstance(instance.guid, instance.name))
+                    instance => new SelectedSimulationInstance(instance.guid, instance.name, fileviewmodel))
                 );
             })
         });
-    
-    
 }
 
 // Create binding when DOM loads
 ko.applyBindings(window.dashboard = new DashboardViewModel());
-

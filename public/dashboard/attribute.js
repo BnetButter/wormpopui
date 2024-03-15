@@ -1,6 +1,3 @@
-var currentlySelectedAttribute = null;
-var selectedSimulations = []; 
-
 function attribute_AttributeModel(sampleText, dashboardFileViewModel) {
     var self = this;
     self.sampleText = sampleText;
@@ -10,12 +7,12 @@ function attribute_AttributeModel(sampleText, dashboardFileViewModel) {
 
     self.selected.subscribe(function(newValue) {
         if (newValue) {
-            if (currentlySelectedAttribute && currentlySelectedAttribute !== self) {
-                currentlySelectedAttribute.selected(false);
+            if (dashboardFileViewModel.currentlySelectedAttribute && dashboardFileViewModel.currentlySelectedAttribute !== self) {
+                dashboardFileViewModel.currentlySelectedAttribute.selected(false);
             }
-            currentlySelectedAttribute = self;
+            dashboardFileViewModel.currentlySelectedAttribute = self;
            
-            updateGraphBasedOnSelections(self);
+            updateGraphBasedOnSelections(self, dashboardFileViewModel);
         }
     });
 
@@ -23,10 +20,8 @@ function attribute_AttributeModel(sampleText, dashboardFileViewModel) {
         self.simulationsData.push({ guid: simulationGUID, name: simulationName, data: data, timestepData: timestepData });
     };
 }
-
-
-function updateGraphBasedOnSelections(attributeModel) {
-    let relevantData = attributeModel.simulationsData.filter(sd => selectedSimulations.includes(sd.guid));
+function updateGraphBasedOnSelections(attributeModel, dashboardFileViewModel) {
+    let relevantData = attributeModel.simulationsData.filter(sd => dashboardFileViewModel.selectedSimulations.includes(sd.guid));
 
     let uniqueData = relevantData.reduce((acc, curr) => {
         if (!acc.find(item => item.guid === curr.guid)) {
@@ -37,7 +32,6 @@ function updateGraphBasedOnSelections(attributeModel) {
 
     updateGraph(uniqueData, attributeModel.sampleText, attributeModel.dashboardFileViewModel.name);
 }
-
 function parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName) {
     const rows = tsvContent.trim().split('\n');
     const headers = rows[0].split('\t');
@@ -60,7 +54,6 @@ function parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName) {
             }
         });
     });
-
     headers.forEach(header => {
         if (header !== "Timestep") {
             let attributeModel = dashboardFileViewModel.attributeList().find(model => model.sampleText === header);
@@ -97,7 +90,6 @@ function attribute_Main(dashboardFileViewModel, selectedSimulationInstance) {
     const simulationName = selectedSimulationInstance.name;
     fetchAndParseTSV(guid, dashboardFileViewModel, simulationName);
 }
-
 /* --- DO NOT EDIT BELOW --- */
 window.dashboard.dashboardSummaries.forEach(_fileviewmodel => {
     _fileviewmodel.simulationInstances.subscribe(function (_simulationInstance) {

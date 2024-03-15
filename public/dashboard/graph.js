@@ -1,5 +1,7 @@
+function updateGraph(simulationsData, attributeName, dashboardName) {
+    // Construct the dynamic ID based on the dashboardName
+    var plotId = 'plot-' + dashboardName.toLowerCase().replace(/\s+/g, '-');
 
-function updateGraph(simulationsData, attributeName) {
     var traces = simulationsData.map(simulation => ({
         x: simulation.timestepData,
         y: simulation.data,
@@ -21,5 +23,5 @@ function updateGraph(simulationsData, attributeName) {
         }
     };
 
-    Plotly.react('linePlot', traces, layout);
+    Plotly.react(plotId, traces, layout);
 }

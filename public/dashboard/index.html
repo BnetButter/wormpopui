@@ -37,9 +37,8 @@
                         
                     </div>
                 </div>
-                <div class="right-section">
-                    <div id="linePlot"></div>
-                </div>
+                <div class="right-section" data-bind="attr: {id: 'plot-' + name.toLowerCase().replace(/\s+/g, '-') }"></div>
+
             </div>
             <div class="bottom-section" style="display:block; overflow-x:auto">
                 <!-- TODO REPLACE WITH A TABLE -->

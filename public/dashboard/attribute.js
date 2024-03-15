@@ -35,9 +35,8 @@ function updateGraphBasedOnSelections(attributeModel) {
         return acc;
     }, []);
 
-    updateGraph(uniqueData, attributeModel.sampleText);
+    updateGraph(uniqueData, attributeModel.sampleText, attributeModel.dashboardFileViewModel.name);
 }
-
 
 function parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName) {
     const rows = tsvContent.trim().split('\n');

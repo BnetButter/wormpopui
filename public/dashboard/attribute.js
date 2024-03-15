@@ -4,34 +4,43 @@ function attribute_AttributeModel(sampleText, dashboardFileViewModel) {
     self.dashboardFileViewModel = dashboardFileViewModel;
     self.selected = ko.observable(false);
     self.simulationsData = [];
-
+  
     self.selected.subscribe(function(newValue) {
-        if (newValue) {
-            if (dashboardFileViewModel.currentlySelectedAttribute && dashboardFileViewModel.currentlySelectedAttribute !== self) {
-                dashboardFileViewModel.currentlySelectedAttribute.selected(false);
-            }
-            dashboardFileViewModel.currentlySelectedAttribute = self;
-           
-            updateGraphBasedOnSelections(self, dashboardFileViewModel);
-        }
+      if (newValue) {
+        dashboardFileViewModel.selectedAttributes.push(self);
+      } else {
+        dashboardFileViewModel.selectedAttributes.remove(self);
+      }
+  
+      updateGraphBasedOnSelections(dashboardFileViewModel);
     });
-
+  
     self.addSimulationData = function(simulationGUID, simulationName, data, timestepData) {
-        self.simulationsData.push({ guid: simulationGUID, name: simulationName, data: data, timestepData: timestepData });
+      self.simulationsData.push({ guid: simulationGUID, name: simulationName, data: data, timestepData: timestepData });
     };
-}
-function updateGraphBasedOnSelections(attributeModel, dashboardFileViewModel) {
-    let relevantData = attributeModel.simulationsData.filter(sd => dashboardFileViewModel.selectedSimulations.includes(sd.guid));
-
-    let uniqueData = relevantData.reduce((acc, curr) => {
-        if (!acc.find(item => item.guid === curr.guid)) {
-            acc.push(curr);
+  }
+  function updateGraphBasedOnSelections(dashboardFileViewModel) {
+    const selectedAttributes = dashboardFileViewModel.selectedAttributes();
+    const selectedSimulations = dashboardFileViewModel.selectedSimulations;
+  
+    const simulationsData = selectedSimulations.map(simulationGUID => {
+      const simulationData = selectedAttributes.reduce((acc, attribute) => {
+        const simulationInfo = attribute.simulationsData.find(sd => sd.guid === simulationGUID);
+        if (simulationInfo) {
+          acc.data.push(simulationInfo.data);
+          acc.timestepData = simulationInfo.timestepData;
+          acc.name = simulationInfo.name;
         }
         return acc;
-    }, []);
-
-    updateGraph(uniqueData, attributeModel.sampleText, attributeModel.dashboardFileViewModel.name);
-}
+      }, { data: [], timestepData: [], name: '' });
+  
+      return simulationData;
+    });
+  
+    const attributeNames = selectedAttributes.map(attr => attr.sampleText);
+  
+    updateGraph(simulationsData, attributeNames, dashboardFileViewModel.name);
+  }
 function parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName) {
     const rows = tsvContent.trim().split('\n');
     const headers = rows[0].split('\t');

@@ -38,18 +38,19 @@ function DashBoardFileViewModel(name, filename) {
     self.paramsList = ko.observableArray();
     self.attributeList = ko.observableArray();
     self.selectedData = ko.observableArray();
-    self.currentlySelectedAttribute = null;
+    self.selectedAttributes = ko.observableArray(); // Store an array of selected attributes
     self.selectedSimulations = [];
-
+  
     self.updateSelectedData = ko.computed(function() {
-        var selectedAttributes = self.attributeList().filter(function(attr) {
-            return attr.selected();
-        }).map(function(attr) {
-            return attr.sampleText;
-        });
-        self.selectedData(selectedAttributes);
+      var selectedAttributes = self.attributeList().filter(function(attr) {
+        return attr.selected();
+      }).map(function(attr) {
+        return attr.sampleText;
+      });
+  
+      self.selectedData(selectedAttributes);
     });
-}
+  }
 
 function DashboardViewModel() {
     const self = this;

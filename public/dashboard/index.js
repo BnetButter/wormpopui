@@ -55,6 +55,8 @@ function DashboardViewModel() {
     self.dashboardSummaries = [
         new DashBoardFileViewModel("Summary", "summary.tsv", "summary"),
         new DashBoardFileViewModel("Stage Transitions", "stage_transitions.tsv", "transitions"),
+        new DashBoardFileViewModel("Death Transitions", "death_transitions.tsv"),
+        new DashBoardFileViewModel("Variant Count", "variant_count.tsv"),
     ]
     
     fetch('/api/job-status')

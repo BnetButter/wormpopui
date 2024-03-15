@@ -1,18 +1,15 @@
 
-// Function to update the graph with new data
-function updateGraph(timestepData, attributeData, attributeName) {
-    var trace = {
-        x: timestepData, // X-axis data from timestep data
-        y: attributeData, // Y-axis data from the selected attribute
-        type: 'scatter',  // Defines the type of plot, which is a line plot in this case
-        mode: 'lines+markers', // Graph will have both lines and markers
-        name: attributeName // Use the attribute name as the trace name
-    };
-
-    var data = [trace];
+function updateGraph(simulationsData, attributeName) {
+    var traces = simulationsData.map(simulation => ({
+        x: simulation.timestepData,
+        y: simulation.data,
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: `${attributeName} - ${simulation.name}` 
+    }));
 
     var layout = {
-        title: attributeName + ' vs. Time', // Dynamic title based on the selected attribute
+        title: `${attributeName} vs. Time`,
         xaxis: {
             title: 'Time',
             showgrid: false,
@@ -24,6 +21,5 @@ function updateGraph(timestepData, attributeData, attributeName) {
         }
     };
 
-    // Render the plot to the div with id 'linePlot'
-    Plotly.newPlot('linePlot', data, layout);
+    Plotly.react('linePlot', traces, layout);
 }

@@ -3,8 +3,32 @@ function SelectedSimulationInstance(guid, name) {
     self.guid = guid;
     self.name = name;
     self.selected = ko.observable(false);
-    self.toggleSelected = () => {self.selected(!self.selected())}
+
+    self.selected.subscribe(function(newValue) {
+        const index = selectedSimulations.indexOf(self.guid);
+        if (newValue) {
+            if (index === -1) { // Ensure only adding if not present
+                selectedSimulations.push(self.guid);
+            }
+        } else {
+            if (index > -1) { // Ensure removing if present
+                selectedSimulations.splice(index, 1);
+            }
+        }
+        
+        triggerGraphUpdate();
+    });
+
+    self.toggleSelected = () => { self.selected(!self.selected()); }
 }
+
+function triggerGraphUpdate() {
+    if (currentlySelectedAttribute) {
+        // Re-filter and deduplicate based on updated selectedSimulations
+        updateGraphBasedOnSelections(currentlySelectedAttribute);
+    }
+}
+
 
 function DashBoardFileViewModel(name, filename) {
     const self = this;

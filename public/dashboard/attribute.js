@@ -1,54 +1,80 @@
-function attribute_AttributeModel(sampleText, data = [], dashboardFileViewModel) {
+var currentlySelectedAttribute = null;
+var selectedSimulations = []; 
+
+function attribute_AttributeModel(sampleText, dashboardFileViewModel) {
     var self = this;
     self.sampleText = sampleText;
-    self.data = data;
-    self.dashboardFileViewModel = dashboardFileViewModel; // Store reference to the dashboardFileViewModel
+    self.dashboardFileViewModel = dashboardFileViewModel;
     self.selected = ko.observable(false);
+    self.simulationsData = [];
 
     self.selected.subscribe(function(newValue) {
-        if (newValue === true) {
-            console.log("Selected attribute: ", self.sampleText, "Data: ", self.data);
-            // Use the dashboardFileViewModel passed to this model to access timestepData
-            updateGraph(self.dashboardFileViewModel.timestepData, self.data, self.sampleText);
+        if (newValue) {
+            if (currentlySelectedAttribute && currentlySelectedAttribute !== self) {
+                currentlySelectedAttribute.selected(false);
+            }
+            currentlySelectedAttribute = self;
+           
+            updateGraphBasedOnSelections(self);
         }
     });
+
+    self.addSimulationData = function(simulationGUID, simulationName, data, timestepData) {
+        self.simulationsData.push({ guid: simulationGUID, name: simulationName, data: data, timestepData: timestepData });
+    };
 }
 
-function parseTSV(tsvContent, dashboardFileViewModel) {
+
+function updateGraphBasedOnSelections(attributeModel) {
+    let relevantData = attributeModel.simulationsData.filter(sd => selectedSimulations.includes(sd.guid));
+
+    let uniqueData = relevantData.reduce((acc, curr) => {
+        if (!acc.find(item => item.guid === curr.guid)) {
+            acc.push(curr);
+        }
+        return acc;
+    }, []);
+
+    updateGraph(uniqueData, attributeModel.sampleText);
+}
+
+
+function parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName) {
     const rows = tsvContent.trim().split('\n');
     const headers = rows[0].split('\t');
-    const dataRows = rows.slice(1); // Remove header row
+    const dataRows = rows.slice(1);
 
     let columnData = headers.reduce((acc, header) => {
         acc[header] = [];
         return acc;
     }, {});
 
-    let timestepData = []; // Array to hold timestep data
+    let timestepData = [];
 
     dataRows.forEach(row => {
         const values = row.split('\t');
         headers.forEach((header, index) => {
-            if (values[index] !== undefined) { // Check for undefined in case of missing data
-                if (header === "Timestep") { // Assuming 'Timestep' is the column header for timestep data
-                    timestepData.push(values[index]); // Store timestep data separately
-                } else {
-                    columnData[header].push(values[index]);
-                }
+            if (values[index] !== undefined && header !== "Timestep") {
+                columnData[header].push(values[index]);
+            } else if (header === "Timestep") {
+                timestepData.push(values[index]);
             }
         });
     });
 
-    dashboardFileViewModel.timestepData = timestepData; // Store timestep data in the dashboardFileViewModel
-    dashboardFileViewModel.attributeList.removeAll();
     headers.forEach(header => {
-        if (header !== "Timestep") { // Exclude timestep column from attribute list
-            dashboardFileViewModel.attributeList.push(new attribute_AttributeModel(header, columnData[header], dashboardFileViewModel));
+        if (header !== "Timestep") {
+            let attributeModel = dashboardFileViewModel.attributeList().find(model => model.sampleText === header);
+            if (!attributeModel) {
+                attributeModel = new attribute_AttributeModel(header, dashboardFileViewModel);
+                dashboardFileViewModel.attributeList.push(attributeModel);
+            }
+            attributeModel.addSimulationData(guid, simulationName, columnData[header], timestepData);
         }
     });
 }
 
-function fetchAndParseTSV(guid, dashboardFileViewModel) {
+function fetchAndParseTSV(guid, dashboardFileViewModel, simulationName) { 
     const tsvFilePath = `/api/data/${guid}/${dashboardFileViewModel.filename}`;
 
     fetch(tsvFilePath)
@@ -59,7 +85,7 @@ function fetchAndParseTSV(guid, dashboardFileViewModel) {
             return response.text();
         })
         .then(tsvContent => {
-            parseTSV(tsvContent, dashboardFileViewModel);
+            parseTSV(tsvContent, dashboardFileViewModel, guid, simulationName);
         })
         .catch(error => {
             console.error('Failed to fetch or parse the TSV file:', error);
@@ -69,7 +95,8 @@ function fetchAndParseTSV(guid, dashboardFileViewModel) {
 function attribute_Main(dashboardFileViewModel, selectedSimulationInstance) {
     console.log("ATTRIBUTE MAIN");
     const guid = selectedSimulationInstance.guid;
-    fetchAndParseTSV(guid, dashboardFileViewModel);
+    const simulationName = selectedSimulationInstance.name;
+    fetchAndParseTSV(guid, dashboardFileViewModel, simulationName);
 }
 
 /* --- DO NOT EDIT BELOW --- */
@@ -78,7 +105,7 @@ window.dashboard.dashboardSummaries.forEach(_fileviewmodel => {
         _simulationInstance.forEach(_instance => {
             _instance.selected.subscribe(newValue => {
                 attribute_Main(_fileviewmodel, _instance);
-            })
-        })
-    })
-})
+            });
+        });
+    });
+});

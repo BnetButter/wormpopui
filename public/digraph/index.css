@@ -5,6 +5,53 @@
 }
 
 #controls {
-    display:flex;
-    flex-direction: column;
+    /*display:flex;
+    flex-direction: column;*/
+    /*position: absolute;*/
+    position: fixed;
+    /*font-size: calc(1vw + 1vh);
+    width: calc(10vw + 10vh);
+    height: calc(5vw + 5vh);
+    padding: calc(1vw + 1vh);*/
+    display: grid;
+    grid-template-columns: repeat(2,175px);
 }
+
+.a, .b {grid-row-start: 1;grid-row-end: 2;}
+.c, .d {grid-row-start: 2;grid-row-end: 3;}
+.e, .k{grid-row-start: 3;grid-row-end: 4;}
+.l, .m {grid-row-start: 4;grid-row-end: 5;}
+.g {grid-row-start: 5;grid-row-end: 6;}
+
+
+#start, #stop, #reset, #step, #show-step-button{
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 5px;
+    min-width: 160px;
+  }
+
+  #show-step-button {
+    background-color: maroon;
+  }
+  
+  /* Hover Effect */
+  #start:hover, #stop:hover, #reset:hover, #step:hover {
+    background-color: #45a049; /* Darker Green */
+  }
+
+  input {
+        width: 138px;
+        margin-left: 5px;
+        padding: 5px 10px;
+        margin-top: 10px;
+  }

@@ -10,20 +10,15 @@
     <div id="simulation-name"></div>
     <div id="graph-container">
         <div id="controls">
-            <button id="start">Start</button>
-            <button id="stop">Stop</button>
-            <button id="reset">Reset</button>
-            <button id="step">Step</button>
-
-            <div>
-                <input type="number" id="show-step-value" value="0">
-                <button id="show-step-button">Show Time Step</button>
-            </div> 
-            <div id="timestep-container">
-                <label for="timestep">Timestep (as integer):</label>
-                <input type="number" id="timestep" readonly>
-                <p>Time Elapsed DD:HH <span id="elapsed-time"></span></p>
-            </div>
+            <div class="item a"><button id="start">Start</button></div>
+            <div class="item b"><button id="stop">Stop</button></div>
+            <div class="item c"><button id="reset">Reset</button></div>
+            <div class="item d"><button id="step">Step</button></div>
+            <div class="item e"><button id="show-step-button">Show Time Step</button></div>
+            <div class="item k"><input type="number" id="show-step-value" value="0"></div>
+            <div class="item l"><label for="timestep">Timestep (as integer):</label></div>
+            <div class="item m"><input type="number" id="timestep" readonly></div>
+            <div class="item g"><p>Time Elapsed DD:HH <span id="elapsed-time"></span></p></div>
         </div>
         <div id="svg-container"></div>
     </div>

@@ -406,7 +406,7 @@ class Simulation:
         
             with open(self.variant_count, "w") as fp:
                 writer = csv.writer(fp, delimiter="\t")
-                fields = [ variant.variant for variant in Simulation.variants ]
+                fields = ["Timestep"] + [ variant.variant for variant in Simulation.variants ]
                 writer.writerow(fields)
 
                 
@@ -438,7 +438,7 @@ class Simulation:
 
         with open(self.variant_count, "a+") as fp:
             writer = csv.writer(fp, delimiter="\t")
-            data = [ counter[variant.variant] for variant in Simulation.variants ]
+            data = [self.timestep] + [ counter[variant.variant] for variant in Simulation.variants ]
             writer.writerow(data)
 
 

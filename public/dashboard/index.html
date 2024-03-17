@@ -40,20 +40,20 @@
                 <div class="right-section" data-bind="attr: {id: 'plot-' + name.toLowerCase().replace(/\s+/g, '-') }"></div>
 
             </div>
-            <div class="bottom-section" style="display:block; overflow-x:auto">
+            <div class="container mx-auto px-4 py-8" style="display:block; overflow-x:auto">
                 <!-- TODO REPLACE WITH A TABLE -->
-                <table class="params-table">
-                    <thead>
+                <table class="table-auto border-collapse" style="width:20%">
+                    <thead class="bg-gray-800 text-white">
                         <tr>
-                            <th>Parameter Name</th>
-                            <th>Value</th>
+                            <th class="border-2 px-4 py-2 text-center align-middle">Parameter Name</th>
+                            <th class="border-2 px-4 py-2 text-center align-middle">Value</th>
                         </tr>
                     </thead>
                     <tbody data-bind="foreach: paramsList">
                         <!-- Dynamic Table Rows -->
-                        <tr data-bind="css: { selected: selected }">
-                            <td data-bind="text: sampleText"></td>
-                            <td data-bind="text: sampleData"></td>
+                        <tr class="hover:bg-gray-100" data-bind="css: { selected: selected }">
+                            <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: sampleText"></td>
+                            <td class="border-2 px-4 py-2 text-center align-middle" data-bind="text: sampleData"></td>
                         </tr>
                     </tbody>
                 </table>

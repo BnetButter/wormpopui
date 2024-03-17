@@ -1,24 +1,30 @@
-var trace1 = {
-x: [1, 2, 3, 4],
-y: [10, 15, 13, 17],
-type: 'scatter',  // this defines the type of plot, which is a line plot in this case
-mode: 'lines+markers', // this means the graph will have both lines and markers
-name: 'Sample Data'
-};
-
-var data = [trace1];
-
-var layout = {
-title: 'Simple Line Plot',
-xaxis: {
-    title: 'X Axis',
-    showgrid: false,
-    zeroline: false
-},
-yaxis: {
-    title: 'Y Axis',
-    showline: false
-}
-};
-
-Plotly.newPlot('linePlot', data, layout);
+function updateGraph(simulationsData, attributeNames, dashboardName) {
+    // Construct the dynamic ID based on the dashboardName
+    var plotId = 'plot-' + dashboardName.toLowerCase().replace(/\s+/g, '-');
+  
+    // Create traces for each attribute and simulation combination
+    var traces = simulationsData.flatMap((simulation, simulationIndex) => {
+      return attributeNames.map((attributeName, attributeIndex) => ({
+        x: simulation.timestepData,
+        y: simulation.data[attributeIndex],
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: `${attributeName} - ${simulation.name}`
+      }));
+    });
+  
+    var layout = {
+      title: `${attributeNames.join(', ')} vs. Time`,
+      xaxis: {
+        title: 'Time',
+        showgrid: false,
+        zeroline: false
+      },
+      yaxis: {
+        title: attributeNames.join(', '),
+        showline: false
+      }
+    };
+  
+    Plotly.react(plotId, traces, layout);
+  }

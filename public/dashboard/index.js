@@ -3,6 +3,8 @@ function SelectedSimulationInstance(guid, name, dashboardViewModel) {
     self.guid = guid;
     self.name = name;
     self.selected = ko.observable(false);
+    self.attributes = ko.observable()
+
     self.dashboardViewModel = dashboardViewModel;
 
     self.selected.subscribe(function(newValue) {
@@ -21,6 +23,8 @@ function SelectedSimulationInstance(guid, name, dashboardViewModel) {
     });
 
     self.toggleSelected = () => { self.selected(!self.selected()); }
+
+    self.attributes = ko.observableArray()
 }
 
 function triggerGraphUpdate(dashboardViewModel) {
@@ -29,6 +33,23 @@ function triggerGraphUpdate(dashboardViewModel) {
         updateGraphBasedOnSelections(dashboardViewModel.currentlySelectedAttribute, dashboardViewModel);
     }
 }
+
+function TableViewModel(headers, rows) {
+    var self = this    
+    self.testtext = "hello"
+    self.headers = ["Parameters", ...headers]
+    self.rows = rows
+    self.paramsList = []
+}
+
+function Row(attributeName, values, hasDifference) {
+    const self = this;
+    self.name = attributeName
+    self.values = [attributeName, ...values]
+    self.hasDifference = hasDifference
+}
+
+
 
 function DashBoardFileViewModel(name, filename) {
     const self = this;
@@ -40,6 +61,11 @@ function DashBoardFileViewModel(name, filename) {
     self.selectedData = ko.observableArray();
     self.selectedAttributes = ko.observableArray(); // Store an array of selected attributes
     self.selectedSimulations = [];
+
+
+    self.table = ko.observable(new TableViewModel([], []))
+
+    self.tableDidUpdate = ko.observable(false)
   
     self.updateSelectedData = ko.computed(function() {
       var selectedAttributes = self.attributeList().filter(function(attr) {
@@ -50,6 +76,42 @@ function DashBoardFileViewModel(name, filename) {
   
       self.selectedData(selectedAttributes);
     });
+
+
+
+    self.tableDidUpdate.subscribe(() => {
+        
+        const selectedSimulations = self.simulationInstances().filter(instance => instance.selected())
+        
+        if (selectedSimulations.length === 0)
+            return;
+        
+        const baseAttribute = selectedSimulations[0].attributes()
+
+        const headers = selectedSimulations.map(instance => instance.name)
+        
+        const attributeNames = Object.keys(baseAttribute)
+
+        const rows = []
+        for (const name of attributeNames) {
+            const row = []
+            for (const simulation of selectedSimulations) {
+                const attr = simulation.attributes()
+                row.push(attr[name])
+            }
+
+            rows.push(new Row(name, row, !row.every((value) => value === row[0])))
+        }
+
+        
+        for (const row of rows) {
+            // console.log(row)
+        }
+
+        self.table(new TableViewModel(headers, rows))
+
+
+    })
   }
 
 function DashboardViewModel() {

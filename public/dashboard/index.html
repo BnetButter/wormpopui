@@ -8,6 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .yellow-row {
+            background-color: yellow;
+        }
+    </style>
+    
 </head>
 <body>
     <div id="dashboard" data-bind="foreach: dashboardSummaries">
@@ -42,18 +48,17 @@
             </div>
             <div class="bottom-section" style="display:block; overflow-x:auto">
                 <!-- TODO REPLACE WITH A TABLE -->
-                <table class="params-table">
+                <table class="params-table" data-bind="with: table">
                     <thead>
-                        <tr>
-                            <th>Parameter Name</th>
-                            <th>Value</th>
+                        <tr data-bind="foreach: headers">
+                            <th data-bind="text: $data"></th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: paramsList">
+
+                    <tbody data-bind="foreach: rows">
                         <!-- Dynamic Table Rows -->
-                        <tr data-bind="css: { selected: selected }">
-                            <td data-bind="text: sampleText"></td>
-                            <td data-bind="text: sampleData"></td>
+                        <tr data-bind="foreach: values, css: { 'yellow-row': hasDifference }">
+                            <td data-bind="text: $data"></td>
                         </tr>
                     </tbody>
                 </table>

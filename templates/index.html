@@ -8,24 +8,30 @@
   <button onclick="window.location.href='/dashboard/index.html'">Dashboard</button>
   <button onclick="window.location.href='/jobs.html'">View Jobs</button>
   <body>
-    <form action="/run-simulation" method="post" class="container">
-      {% for key, value in default_params.items() %}
+    <div style="display:flex;">
       <div>
-        <label for="{{ key }}">{{ key }}</label>
-        <input
-          type="{{ 'number' if value is number else 'text' }}"
-          id="{{ key }}"
-          name="{{ key }}"
-          value="{{ value }}"
-        />
+        <form action="/run-simulation" method="post" class="container">
+          {% for key, value in default_params.items() %}
+          <div>
+            <label for="{{ key }}">{{ key }}</label>
+            <input
+              type="{{ 'number' if value is number else 'text' }}"
+              id="{{ key }}"
+              name="{{ key }}"
+              value="{{ value }}"
+            />
+          </div>
+          {% endfor %}
+          <div>
+           <label for="name">Simulation Name:</label>
+           <input type="text" id="database" name="name" required />
+          </div>
+          <button type="submit">Run Simulation</button>
+        </form>
       </div>
-      {% endfor %}
       <div>
-        <label for="name">Simulation Name:</label>
-        <input type="text" id="database" name="name" required />
+        <img src="https://cdn-uploads.huggingface.co/production/uploads/noauth/WxFA0gVO0Zpj7lcI_m9sh.jpeg" stye="position:relative; ">
       </div>
-      <button type="submit">Run Simulation</button>
-    </form>
-   
+    </div>
   </body>
 </html>

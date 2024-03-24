@@ -78,7 +78,25 @@ function onPageLoad() {
         }
         const timestepElement = document.getElementById('show-step-value');
         const timestep = parseInt(timestepElement.value);
-        manipulateSVG(simulation_data.summary, simulation_data.transition, timestep)
+        clearInterval(simulation_data.playbackID)
+        manipulateSVG(simulation_data.summary, simulation_data.transitions, timestep)
+    })
+
+    document.getElementById('reset').addEventListener('click', () => {
+        if (!dataReady()) {
+            return;
+        }
+        clearInterval(simulation_data.playbackID)
+    })
+
+    document.getElementById('reset').addEventListener('click', () => {
+        if (!dataReady()) {
+            return;
+        }
+        clearInterval(simulation_data.playbackID)
+        const timestepElement = document.getElementById('show-step-value');
+        const timestep = parseInt(timestepElement.value);
+        manipulateSVG(simulation_data.summary, simulation_data.transitions, 0)
     })
 }
 
@@ -115,14 +133,26 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
     let timestep = 0
 
     const setSize = (node, name, i) => {
-        let size = Math.sqrt(parseInt(data[name][i]))
-        node.setAttribute('rx', size / 3)
-        node.setAttribute('ry', size / 3)
+        try {
+            let size = Math.sqrt(parseInt(data[name][i]))
+            node.setAttribute('rx', size / 3)
+            node.setAttribute('ry', size / 3)
+        } catch {
+            
+        }
+   
     }
 
     const setEdgeSize = (node, name, i) => {
-        let size = Math.sqrt(parseInt(transitionCount[name][i]))
-        node.setAttribute("stroke-width", size)
+        try {
+            let size = Math.sqrt(parseInt(transitionCount[name][i]))
+            node.setAttribute("stroke-width", size)
+        } catch {
+            console.log(name)
+            console.log(transitionCount)
+            console.log(i)
+        }
+     
     }
 
  

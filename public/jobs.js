@@ -24,8 +24,24 @@ function JobViewModel() {
     };
 
     self.deleteJob = function(job) {
-        // TODO: Implement delete functionality
-        console.log("Deleting job", job.guid);
+        if (confirm(`Are you sure you want to delete job ${job.guid}?`)) {
+            fetch(`/api/delete-job/${job.guid}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    self.jobs.remove(job); // Remove the job from the observable array
+                    console.log(`Job ${job.guid} deleted successfully`);
+                } else {
+                    console.error(`Error deleting job ${job.guid}: ${data.error}`);
+                }
+            })
+            .catch(error => console.error('Error deleting job:', error));
+        }
     };
 
     self.viewGraph = function(job) {

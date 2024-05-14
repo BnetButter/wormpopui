@@ -53,7 +53,7 @@ def run_simulation():
     name = parameters.pop('name')
 
     directory_name = os.path.join(os.getcwd(), "instances", guid)
-    database_name = os.path.join(directory_name, "database.sqlite")
+    database_name = os.path.join("database.sqlite")
 
     os.makedirs(directory_name)
 

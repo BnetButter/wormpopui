@@ -76,8 +76,7 @@ def run_simulation():
     if os.name == 'posix':
         # Start the subprocess detached from its parent, running in a new process group
         child = subprocess.Popen(command, 
-                         stdout=subprocess.DEVNULL, 
-                         stderr=subprocess.STDOUT, 
+                         
                          stdin=subprocess.DEVNULL,
                          preexec_fn=os.setsid)
     # On Windows

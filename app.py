@@ -6,7 +6,7 @@ import uuid
 import sqlite3
 import signal
 from datetime import datetime
-
+import shutil
 
 app = Flask(__name__)
 
@@ -20,6 +20,26 @@ def form():
 @app.route('/<path:filename>')
 def public_files(filename):
     return send_from_directory('public', filename)
+
+@app.route('/api/delete-job/<guid>', methods=['DELETE'])
+def delete_job(guid):
+    try:
+        with sqlite3.connect('processtable.sqlite') as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM ProcessTable WHERE guid=?", (guid,))
+            conn.commit()
+
+        instances_dir = os.path.join(os.getcwd(), "instances")
+        for root, dirs, files in os.walk(instances_dir):
+            for dir_name in dirs:
+                if dir_name == guid:
+                    directory_path = os.path.join(root, dir_name)
+                    shutil.rmtree(directory_path)
+                    break
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/run-simulation', methods=['POST'])
 def run_simulation():

@@ -96,7 +96,6 @@ def run_simulation():
     if os.name == 'posix':
         # Start the subprocess detached from its parent, running in a new process group
         child = subprocess.Popen(command, 
-                         
                          stdin=subprocess.DEVNULL,
                          preexec_fn=os.setsid)
     # On Windows
@@ -205,6 +204,53 @@ def simulation_file(guid, file):
     directory_name = os.path.join(os.getcwd(), "instances", guid)
     return send_from_directory(directory_name, file)
 
+
+@app.route("/api/sql", methods=["POST"])
+def sqlquery():
+    assert request.is_json
+
+    data = request.get_json()
+
+    query: str = data["query"]
+    guid: str = data["guid"]
+    rows_per_page = int(data["rowsPerPage"])
+    page_number = int(data["pageNumber"]) - 1
+
+    min_page = page_number * rows_per_page
+    max_page = ((page_number + 1) * rows_per_page)
+
+    db_path = os.path.join("instances", guid, "database.sqlite")
+
+    query += f" LIMIT {rows_per_page} OFFSET {min_page}"
+    
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+    
+            # Extract column headers
+            columns = [description[0] for description in cursor.description]
+            
+            # Initialize a dictionary with the headers, each associated with an empty list
+            results = {header: [] for header in columns}
+
+            # Populate the dictionary with data from each row
+            for i, row in enumerate(rows):
+                for header, value in zip(columns, row):
+                    
+                    results[header].append(value)
+            
+            print(columns)
+                    
+
+
+    except sqlite3.Error as e:
+        print(e)
+        return jsonify({ "error": str(e) })
+    else:
+        return jsonify({"error": None, "result": results, "header": columns })
+    
 
 
 # Function to create the ProcessTable

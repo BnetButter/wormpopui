@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Layout</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>    
+    <link rel="stylesheet" href="./directory.css">
+</head>
+<body class="full-height">
+    <div>
+        <button onclick="window.location.href='/dashboard/index.html'">Dashboard</button>
+        <button onclick="window.location.href='/jobs.html'">View Jobs</button>
+        <button onclick="window.location.href='/directory/index.html'">Directory</button>
+    </div>
+    <div class="split-horizontal full-height">
+        <div class="w-1/4 bg-red-300 full-height">
+            <div data-bind="foreach: allSimulationInstance" class="simulation-container">
+                <div data-bind="
+                    click: $parent.userSelectedSimulation, 
+                    text:name,
+                    css: { defaultColor:!selected(), selectedColor:selected() }"></div>
+            </div>
+        </div>
+        <div class="split-vertical w-3/4">
+            <div class="one-fourth bg-blue-300">
+                <div id="taskbar">
+                    <button data-bind="click: executeSql">Execute SQL</button>
+                    <button>Toggle Graph and Table</button>
+                </div>
+                <textarea data-bind="value: sqlQuery" id="sqlinput"></textarea>
+            </div>
+            <div id="pagination-control" class="flex items-center">
+                <div class="w-64 p-5">
+                    <select data-bind="value: rowsPerPage" id="myDropdown" name="options" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="250">250</option>
+                    </select>
+                </div>
+                <div class="w-28 p-5 flex items-center justify-between">
+                    <!-- Pagination controller -->
+                    <button data-bind="click: pageLeft" class="text-xl px-4 m-1">&#8592;</button> <!-- Left arrow -->
+                    <input data-bind="value: pageNumber" type="text" class="text-center w-12 px-2 py-1 border border-gray-300 rounded" placeholder="Page"> <!-- Text input for page number -->
+                    <button data-bind="click: pageRight" class="text-xl px-4 m-1">&#8594;</button> <!-- Right arrow -->
+                </div>
+            </div>
+            <div class="three-fourth overflow-x-auto">
+                <div>
+                    
+                    
+                    <table data-bind="with: tableFields" class="border-collapse table-auto">
+                        <thead class="bg-gray-800 text-white">
+                            <tr data-bind="foreach: headers">
+                                <th data-bind="text: $data" class="border-2 px-4 py-2 text-center align-middle"></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: rows">
+                            <tr class="hover:bg-gray-100" data-bind="foreach: $data">
+                                <td data-bind="text: $data" class="border-2 px-4 py-2 text-center align-middle"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./directory.js"></script>
+</body>
+</html>

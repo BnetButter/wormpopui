@@ -1,0 +1,33 @@
+/* styles.css */
+.full-height {
+    height: 100vh;
+}
+.split-horizontal {
+    display: flex;
+    height: 100%;
+}
+.split-vertical {
+    display: flex;
+    flex-direction: column;
+    height: 95%;
+}
+.three-fourth {
+    flex: 3;
+}
+.one-fourth {
+    flex: 1;
+}
+
+
+.defaultColor {
+    background-color: white;
+}
+
+.selectedColor {
+    background-color: #48BB78;
+}
+
+#sqlinput {
+    width:100%;
+    height:80%;
+}

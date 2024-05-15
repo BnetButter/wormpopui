@@ -8,6 +8,7 @@ console.log(`guid: ${guid}`);
 const simulation_data = {
     summary: null,
     transitions: null,
+    deathTransitions: null,
     playbackID: null,
 }
 
@@ -37,7 +38,13 @@ function onPageLoad() {
                 "larva_larvaStarve",
                 "dauer_dauerCull",
                 "dauer_dauerStarve",
-                "parlad_parladStarve"
+                "parlad_parladStarve",
+                "adult_cull",
+                "adult_starve",
+                "adult_old",
+                "egg_cull",
+                "parlad_parladCull"
+
 
             ]
             for (const id of edges) {
@@ -71,6 +78,14 @@ function onPageLoad() {
                 )
             }
         });
+    
+    fetch(`/api/data/${guid}/death_transitions.tsv`)
+        .then(response => response.text())
+        .then((content) => {
+            const data = parseGenericTSV(content);
+            simulation_data.deathTransitions = data;
+            console.log(data)
+        })
     
     document.getElementById('show-step-button').addEventListener('click', () => {
         if (!dataReady()) { 
@@ -130,6 +145,19 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
     const adult_egg_edge = getEdge("egg_adult")
     const parlad_dauer_edge = getEdge("parlad_dauer")
 
+    const dauer_cull_edge = getEdge("dauer_dauerCull")
+    const duaer_starve_edge = getEdge("dauer_dauerStarve")
+    const larva_cull_edge = getEdge("larva_larvaCull")
+    const larva_starve_edge = getEdge("larva_larvaStarve")
+
+    const adult_old_age = getEdge("adult_old")
+    const parlad_starve = getEdge("parlad_parladStarve")
+
+    const adult_cull = getEdge("adult_cull")
+    const adult_starve = getEdge("adult_starve")
+    const egg_cull = getEdge("egg_cull")
+    const parlad_cull = getEdge("parlad_parladCull")
+    
     let timestep = 0
 
     const setSize = (node, name, i) => {
@@ -146,13 +174,27 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
     const setEdgeSize = (node, name, i) => {
         try {
             let size = Math.sqrt(parseInt(transitionCount[name][i]))
-            node.setAttribute("stroke-width", size)
+            node.setAttribute("stroke-width", size / 3)
         } catch {
             console.log(name)
             console.log(transitionCount)
             console.log(i)
         }
      
+    }
+
+    const setDeathEdgeSize = (node, name, i) => {
+        
+        const transitionCount = simulation_data.deathTransitions
+
+        try {
+            let size = Math.sqrt(parseInt(transitionCount[name][i]))
+            node.setAttribute("stroke-width", size)
+        } catch {
+            console.log(name)
+            console.log(transitionCount)
+            console.log(i)
+        }
     }
 
  
@@ -189,7 +231,19 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
         setEdgeSize(adult_egg_edge, "adult_laid_egg", timestep)
         setEdgeSize(parlad_dauer_edge, "parlad_to_dauer", timestep)
         
-      
+        setDeathEdgeSize(dauer_cull_edge, "Dauer-culled-ind", timestep)
+        setDeathEdgeSize(duaer_starve_edge, "Dauer-starvation-ind", timestep)
+
+        setDeathEdgeSize(larva_cull_edge, "Larva-culled-ind", timestep)
+        setDeathEdgeSize(larva_starve_edge, "Larva-starvation-ind", timestep)
+
+        setDeathEdgeSize(parlad_starve, "Parlad-starvation-ind", timestep)
+        setDeathEdgeSize(adult_old_age, "Adult-old_age-ind", timestep)
+        setDeathEdgeSize(adult_cull, "Adult-culled-ind", timestep)
+        setDeathEdgeSize(adult_starve, "Adult-starvation-ind", timestep)
+        setDeathEdgeSize(egg_cull, "Egg-culled-ind", timestep)
+        setDeathEdgeSize(parlad_cull, "Parlad-culled-ind", timestep)
+
         updateTimestep(timestep)
         timestep++
     }
@@ -202,6 +256,30 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
         execute_frame()
     }
     // Add more manipulation code here
+}
+
+function parseGenericTSV(tsvString) {
+    // Split the input string into an array of rows
+    const rows = tsvString.trim().split('\n');
+
+    // Extract the header row and create field names
+    const headers = rows.shift().split('\t');
+
+    // Initialize the result object with headers as keys and empty arrays as values
+    const result = headers.reduce((acc, header) => {
+        acc[header] = [];
+        return acc;
+    }, {});
+
+    // Iterate over each row and fill the corresponding arrays in the result object
+    rows.forEach(row => {
+        const values = row.split('\t');
+        headers.forEach((header, index) => {
+            result[header].push(values[index]);
+        });
+    });
+
+    return result;
 }
 
 

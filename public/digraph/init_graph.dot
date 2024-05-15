@@ -15,7 +15,7 @@ digraph {
     invis_adult [ pos="2,8!" shape=plaintext label="" ]
     invis_dauer [ pos="2,4!" shape=plaintext label="" ]
     invis_parlad [ pos="0,6!" shape=plaintext label="" ]
-    
+
 
     invis_dauer_larva_a [ pos="3,5!" shape=plaintext label=""]
     invis_dauer_larva_b [ pos="3,6!" shape=plaintext label=""]
@@ -26,7 +26,9 @@ digraph {
 
     adult -> invis_egg [ id="egg_adult" color="#0000FF80"]
 
-    egg -> invis_larva [ id="egg_larva" ] 
+    egg_cull [ pos="2,14!" shape=plaintext label=Cull ]
+
+    egg -> invis_larva [ id="egg_larva" ]
     larva -> invis_adult [ id="larva_adult" ]
 
     invis_larva_dauer_a -> invis_larva_dauer_b [ id="larva_dauer" ] 
@@ -36,17 +38,27 @@ digraph {
     parlad -> invis_dauer [ id="parlad_dauer" color="#0000FF80"]
 
     parlad_starve [ pos="-2,0!" shape=plaintext label=Starve ]
-    dauer_starve [ pos="6,0!" shape=plaintext  label=Starve ]
-    larva_starve [ pos="6,6!"shape=plaintext label=Starve ] 
-    larva_cull [  pos="6,10!" shape=plaintext   label=Cull ]
+    parlad_cull [ pos="2,0!" label=Cull shape=plaintext]
+
+    dauer_starve [ pos="6,0!" shape=plaintext label=Starve ]
+    larva_starve [ pos="6,6!" shape=plaintext label=Starve ] 
+    larva_cull [  pos="6,10!" shape=plaintext  label=Cull ]
     dauer_cull [ pos="8,4!" shape=plaintext label=Cull ]
 
     adult_old [ pos="-4,8!" fontsize=16 shape=plaintext label="Old Age" ]
+    adult_starve [pos="-3,6!", label="Starve" shape=plaintext]
+    adult_cull [] [pos="-3,10!" label="Cull" shape=plaintext]
     adult_old_invis [ pos="-2,8!" shape=plaintext label="" ]
 
-    adult -> adult_old_invis [ id="adult_old" ]
+    adult -> adult_old[ id="adult_old" ]
+    adult -> adult_starve [ id="adult_starve" ]
+    adult -> adult_cull [ id="adult_cull" ]
+    
+    egg -> egg_cull [ id="egg_cull" ]
 
     parlad -> parlad_starve [ id="parlad_parladStarve" label="" ]
+
+    parlad -> parlad_cull [ id="parlad_parladCull", label=""]
     
     dauer -> dauer_starve [ id="dauer_dauerStarve" label=""]
     dauer -> dauer_cull [ id="dauer_dauerCull" label="" ]

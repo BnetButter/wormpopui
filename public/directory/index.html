@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Split Layout</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>    
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script> 
     <link rel="stylesheet" href="./directory.css">
 </head>
 <body class="full-height">
@@ -28,7 +28,7 @@
             <div class="one-fourth bg-blue-300">
                 <div id="taskbar">
                     <button data-bind="click: executeSql">Execute SQL</button>
-                    <button>Toggle Graph and Table</button>
+                    <button data-bind="click: toggleShowTable">Toggle Graph and Table</button>
                 </div>
                 <textarea data-bind="value: sqlQuery" id="sqlinput"></textarea>
             </div>
@@ -48,13 +48,21 @@
                 </div>
             </div>
             <div class="three-fourth overflow-x-auto">
-                <div>
-                    
-                    
+                
+                <div data-bind="visible: showTable">
                     <table data-bind="with: tableFields" class="border-collapse table-auto">
+                       
                         <thead class="bg-gray-800 text-white">
                             <tr data-bind="foreach: headers">
-                                <th data-bind="text: $data" class="border-2 px-4 py-2 text-center align-middle"></th>
+                                <th class="border-2 px-4 py-2 text-center align-middle">
+                                    <div data-bind="text: name"></div>
+                                    <label>X
+                                        <input name="X-axis" type="radio" data-bind="checked: observableX, attr: { value: name }">
+                                    </label><br>
+                                    <label>Y
+                                        <input name="Y-axis" type="checkbox" data-bind="checked: selected ">
+                                    </label>
+                                </th>
                             </tr>
                         </thead>
                         <tbody data-bind="foreach: rows">
@@ -63,6 +71,9 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div data-bind="hidden: showTable">
+                    <div id="myDiv" style="height:100%; width:100%"></div>
                 </div>
             </div>
         </div>

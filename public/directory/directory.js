@@ -207,7 +207,14 @@ function DirectoryModel() {
             type: 'scatter'
         };
 
-        var data = [trace1];
+        var data = self.selectedY().map((col) => {
+            return {
+                x: Xaxis,
+                y: sqlResults[col],
+                mode: 'lines+markers',
+                type: 'scatter'
+            }
+        })
 
         Plotly.newPlot('myDiv', data, layout)
 

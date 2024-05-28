@@ -302,4 +302,4 @@ if __name__ == '__main__':
     with sqlite3.connect('processtable.sqlite') as conn:
         # Create the ProcessTable if it doesn't exist
         create_process_table(conn)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)

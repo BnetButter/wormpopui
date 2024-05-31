@@ -3,6 +3,8 @@
   <head>
     <title>Simulation Form</title>
     <link rel="stylesheet" href="/index.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+
   </head>
   
   <button onclick="window.location.href='/dashboard/index.html'">Dashboard</button>
@@ -10,20 +12,39 @@
   <button onclick="window.location.href='/directory/index.html'">Directory</button>
 
   <body>
-    <div style="display:flex;">
       <div>
-        <form action="/run-simulation" method="post" class="container">
-          {% for key, value in default_params.items() %}
-          <div>
-            <label for="{{ key }}">{{ key }}</label>
-            <input
-              type="{{ 'number' if value is number else 'text' }}"
-              id="{{ key }}"
-              name="{{ key }}"
-              value="{{ value }}"
-            />
+        <form id="simulationForm" action="/run-simulation" method="post" class="container">
+          <div style="display:flex;">
+            <div>
+              {% for key, value in default_params.items() %}
+              <div>
+                <label for="{{ key }}">{{ key }}</label>
+                <input
+                  type="{{ 'number' if value is number else 'text' }}"
+                  id="{{ key }}"
+                  name="{{ key }}"
+                  value="{{ value }}"
+                />
+              </div>
+              {% endfor %}
+            </div>
+            <div>
+              <h1>Genome Properties</h1>
+              <button data-bind="click: addVariant">Add Variant</button>
+              <div data-bind="foreach: variants">
+                  <div>
+                      <h3 data-bind="text:variantName"></h3>
+                      <div data-bind="foreach: keyValuePairs">
+                          <div>
+                              <label data-bind="text: key"></label>
+                              <input type="text" data-bind="value: value" />
+                          </div>
+                      </div>
+                      <button data-bind="click: $parent.removeVariant">Remove Variant</button>
+                  </div>
+              </div>
           </div>
-          {% endfor %}
+          </div>
           <div>
            <label for="name">Simulation Name:</label>
            <input type="text" id="database" name="name" required />
@@ -31,9 +52,8 @@
           <button type="submit">Run Simulation</button>
         </form>
       </div>
-      <div>
-        <img src="https://cdn-uploads.huggingface.co/production/uploads/noauth/WxFA0gVO0Zpj7lcI_m9sh.jpeg" stye="position:relative; ">
-      </div>
-    </div>
+       </div>
+     <div>
   </body>
+  <script src="/index.js"></script>
 </html>

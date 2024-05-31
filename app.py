@@ -7,14 +7,37 @@ import sqlite3
 import signal
 from datetime import datetime
 import shutil
+import importlib.util
+import sys
 
 app = Flask(__name__)
+
+def dynamic_import(module_name):
+    if module_name in sys.modules:
+        del sys.modules[module_name]
+    spec = importlib.util.find_spec(module_name)
+    if spec is None:
+        raise ImportError(f"Module {module_name} not found")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 @app.route('/')
 def form():
     with open('simulation/constants.json') as f:
         default_params = json.load(f)
+    
     return render_template('index.html', default_params=default_params)
+
+@app.route('/genome-schema')
+def genome_schema():
+    try:
+        wormpop = dynamic_import('simulation.wormpop')
+        # Assuming wormpop has a function or attribute we need
+        schema = wormpop.Genome.get_schema()
+        return jsonify(schema)
+    except ImportError as e:
+        return jsonify({"error": str(e)}), 500
 
 # Route for serving files from the public directory
 @app.route('/<path:filename>')
@@ -43,7 +66,9 @@ def delete_job(guid):
 
 @app.route('/run-simulation', methods=['POST'])
 def run_simulation():
-    parameters = request.form.to_dict()
+    parameters = request.json["parameters"]
+    variants = request.json["variants"]
+
     #directory_name = parameters.pop('directory')  uuid.uuid4()
         
     #os.mkdir("instances")
@@ -56,6 +81,14 @@ def run_simulation():
     database_name = os.path.join("database.sqlite")
 
     os.makedirs(directory_name)
+
+    variants_path = os.path.join(directory_name, "variants.json")
+
+
+    with open(variants_path, "w") as fp:
+        json.dump({
+            "variants": variants
+        }, fp, indent=4) 
 
     with open('simulation/constants.json') as f:
         types = json.load(f)
@@ -76,6 +109,7 @@ def run_simulation():
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
             '--directory=' + directory_name,
+            '--variants=' + variants_path,
             
         ]
     elif(platform == 'posix'):
@@ -84,6 +118,8 @@ def run_simulation():
             '--parameters=' + temp_params_file,
             '--database=' + database_name,
             '--directory=' + directory_name,
+            '--variants=' + variants_path,
+
             
         ]
     else:
@@ -137,7 +173,8 @@ def run_simulation():
     #return response
 
     # redirect to the /jobs page
-    return redirect('/jobs.html')
+
+    return jsonify({"result": "ok"})
 
 
 @app.route('/api/job-status')

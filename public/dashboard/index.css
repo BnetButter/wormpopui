@@ -48,6 +48,7 @@ body, html {
     align-items: center;
     height:100%;
     justify-content: space-around;
+    min-height: 80vh
 }
 
 .simulation-selector {

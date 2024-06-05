@@ -200,19 +200,14 @@ function DirectoryModel() {
         const Yaxis = sqlResults[self.selectedY()[0]]
 
 
-        var trace1 = {
-            x: Xaxis,
-            y: Yaxis,
-            mode: 'lines+markers',
-            type: 'scatter'
-        };
 
         var data = self.selectedY().map((col) => {
             return {
                 x: Xaxis,
                 y: sqlResults[col],
                 mode: 'lines+markers',
-                type: 'scatter'
+                type: 'scatter',
+                name: col
             }
         })
 

@@ -16,7 +16,7 @@ function GenomeProperties(object) {
         if (type === "float") {
             value = parseFloat(value)
         }
-        if (key === "__variant__") {
+        if (key === "variant") {
             return new KeyValuePair(key, value, (value) => { self.variantName(value) })
         }
         return new KeyValuePair(key, value)
@@ -34,6 +34,9 @@ function GenomeVector() {
         .then(response => response.json())
         .then(data => {
             self.schemaCache = data;
+            const defaultVariant = new GenomeProperties(data);
+            defaultVariant.keyValuePairs.find((pair) => pair.key === "variant").value("Default");
+            self.variants.push(defaultVariant)
         })
         .catch(error => {
             console.error('Error fetching genome schema:', error);
@@ -70,6 +73,7 @@ document.getElementById('simulationForm').addEventListener('submit', function(ev
             parameters[key] = value;
         }
     });
+    console.log(parameters)
 
     // Extract dynamic variant parameters from the view model
     const variants = viewModel.variants().map((variant, index) => {

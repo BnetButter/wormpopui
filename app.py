@@ -9,8 +9,15 @@ from datetime import datetime
 import shutil
 import importlib.util
 import sys
+import socket
 
 app = Flask(__name__)
+
+def find_free_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(('', 0))
+        return s.getsockname()[1]
+
 
 def dynamic_import(module_name):
     if module_name in sys.modules:
@@ -77,12 +84,21 @@ def run_simulation():
     #directory_name = os.path.join(os.getcwd(), directory_name)
     name = parameters.pop('name')
 
+    report_individuals = parameters.get('report-individuals')
+    if report_individuals is None:
+        report_individuals = False
+    else:
+        parameters.pop('report-individuals')
+        report_individuals = True
+
     directory_name = os.path.join(os.getcwd(), "instances", guid)
     database_name = os.path.join("database.sqlite")
 
     os.makedirs(directory_name)
 
     variants_path = os.path.join(directory_name, "variants.json")
+
+    port = str(find_free_port())
 
 
     with open(variants_path, "w") as fp:
@@ -110,8 +126,8 @@ def run_simulation():
             '--database=' + database_name,
             '--directory=' + directory_name,
             '--variants=' + variants_path,
-            
-        ]
+            '--socket=' + port
+        ] + [] if not report_individuals else ['--report-individuals']
     elif(platform == 'posix'):
         command = [
             'python3', 'simulation/wormpop.py',
@@ -119,9 +135,8 @@ def run_simulation():
             '--database=' + database_name,
             '--directory=' + directory_name,
             '--variants=' + variants_path,
-
-            
-        ]
+            '--socket=' + port
+        ] + [] if not report_individuals else ['--report-individuals']
     else:
         print("You did something very wrong!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     
@@ -159,8 +174,8 @@ def run_simulation():
         cursor = conn.cursor()
 
         # Insert a new row into the ProcessTable with the pid, guid, and start_time
-        cursor.execute("INSERT INTO ProcessTable (pid, guid, name, start_time) VALUES (?, ?, ?, ?)",
-                    (pid, guid, name, start_time))
+        cursor.execute("INSERT INTO ProcessTable (pid, guid, name, start_time, socket) VALUES (?, ?, ?, ?, ?)",
+                    (pid, guid, name, start_time, port))
 
         # Commit the changes to the database
         conn.commit()
@@ -189,7 +204,7 @@ def job_status_all():
         results = []
     
         for row in rows:
-            pid, guid, name, start_time, _ = row
+            pid, guid, name, start_time, _, port = row
             try:
                 # Try sending signal 0, this does not kill the process but checks if it's possible to send signals
                 os.kill(pid, 0)
@@ -208,7 +223,8 @@ def job_status_all():
                 'start_time': start_time,
                 'time_elapsed': time_elapsed_str,
                 'status': status,
-                'name': name
+                'name': name,
+                'socket': port
             })
 
         return jsonify({'result': results})
@@ -299,7 +315,8 @@ def create_process_table(db_connection):
             guid TEXT NOT NULL,
             name TEXT,
             start_time DATETIME,
-            end_time DATETIME
+            end_time DATETIME,
+            socket TEXT
         )
     ''')
     db_connection.commit()

@@ -23,6 +23,10 @@ function JobViewModel() {
         console.log("Stopping job", job.guid);
     };
 
+    self.viewWorld = (job) => {
+        window.location.href = '/world/index.html?socket=' + job.socket;
+    }
+
     self.deleteJob = function(job) {
         if (confirm(`Are you sure you want to delete job ${job.guid}?`)) {
             fetch(`/api/delete-job/${job.guid}`, {

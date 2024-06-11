@@ -75,6 +75,26 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function handleFood(food) {
+    const x = food.pos[0]
+    const y = food.pos[1]
+    const amount = food.amount
+
+    ctx.fillStyle = 'purple';
+
+    // Draw food as a circle with radius proportional to the amount
+    ctx.beginPath();
+    ctx.arc(x, y, Math.sqrt(amount) / 10, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw the amount as text
+    ctx.fillStyle = 'white';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(amount, x, y);
+}
+
 function handleAgent(agent) {
     const x = agent.pos[0]
     const y = agent.pos[1]
@@ -86,17 +106,20 @@ function handleAgent(agent) {
 // Handle incoming WebSocket messages
 socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    console.log(data);
+    const worms = data.worms
+    const food = data.food
 
     // Clear canvas before redrawing
     clearCanvas();
 
-    // Check if data is an array (history) or a single object (live update)
-    if (Array.isArray(data)) {
-        data.forEach(agent => handleAgent(agent));
-    } else {
-        drawAgent(data.x, data.y);
-    }
+    worms.forEach((worm) => {
+        handleAgent(worm)
+    })
+
+    food.forEach((food) => {
+        handleFood(food)
+    })
+    
 };
 
 socket.onopen = function() {

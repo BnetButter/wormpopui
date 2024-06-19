@@ -1,0 +1,18 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+#viewport {
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+}
+
+#grid {
+    width: 10000px;
+    height: 10000px;
+}

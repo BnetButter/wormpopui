@@ -1,19 +1,52 @@
 // Get WebSocket port from URL query
 const urlParams = new URLSearchParams(window.location.search);
-const socketPort = urlParams.get('socket');
-const socketUrl = `ws://localhost:${socketPort}`;
+const guid = urlParams.get('guid');
 
-// Connect to WebSocket server
-const socket = new WebSocket(socketUrl);
-
+console.log(guid)
 // Canvas element and context
 const canvas = document.getElementById('grid');
 
 const ctx = canvas.getContext('2d');
 const previousPositions = {}
 
+let currtimestep = 0
+
+fetch(`/api/data/${guid}/worm_world.json`)
+    .then((response) => {
+        return response.json()
+    })
+    .then((data) => {
+        console.log("parsed_data")
+    
+        setInterval(() => {
+            render(currtimestep, data)
+            currtimestep += 1
+            if (currtimestep >= data.worm.length) {
+                currtimestep = 0
+            }
+        }, 200)
+    })
+
+function render(timestep, data) {
+    const worms = data.worm
+    const food = data.food
+
+    // Clear canvas before redrawing
+    clearCanvas();
+
+    worms[timestep].forEach((worm) => {
+        handleAgent(worm)
+    })
+
+    food[timestep].forEach((food) => {
+        handleFood(food)
+    })
+}
+
+const variantColors = {}
+
 // Function to draw agent location
-function drawAgent(x, y, stage, name) {
+function drawAgent(x, y, stage, name, variant) {
     const canvasX = x;
     const canvasY = y;
 
@@ -38,6 +71,9 @@ function drawAgent(x, y, stage, name) {
             console.log("Unknown stage: ", stage);
             color = 'black';
     }
+
+
+    
 
     ctx.fillStyle = color;
     ctx.strokeStyle = color;
@@ -77,8 +113,8 @@ function clearCanvas() {
 }
 
 function handleFood(food) {
-    const x = food.pos[0]
-    const y = food.pos[1]
+    const x = food.x
+    const y = food.y
     const amount = food.amount
     const radius = food.radius
 
@@ -103,42 +139,10 @@ function handleFood(food) {
 }
 
 function handleAgent(agent) {
-    const x = agent.pos[0]
-    const y = agent.pos[1]
+    const x = agent.x
+    const y = agent.y
     const name = agent.name
-    const stageShort = agent.stage_short
-    drawAgent(x, y, stageShort, name)
+    const stageShort = agent.stage[0].toUpperCase()
+    drawAgent(x, y, stageShort, name, agent.variant)
 }
 
-// Handle incoming WebSocket messages
-socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-    const worms = data.worms
-    const food = data.food
-
-    // Clear canvas before redrawing
-    clearCanvas();
-
-    worms.forEach((worm) => {
-        handleAgent(worm)
-    })
-
-    food.forEach((food) => {
-        handleFood(food)
-    })
-    
-};
-
-socket.onopen = function() {
-    console.log('WebSocket connection established');
-    // Optionally, send a message to request historical data
-    // socket.send(JSON.stringify({ type: 'requestHistory' }));
-};
-
-socket.onclose = function() {
-    console.log('WebSocket connection closed');
-};
-
-socket.onerror = function(error) {
-    console.error('WebSocket error:', error);
-};

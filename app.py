@@ -127,7 +127,7 @@ def run_simulation():
             '--directory=' + directory_name,
             '--variants=' + variants_path,
             '--socket=' + port
-        ] + [] if not report_individuals else ['--report-individuals']
+        ] + ([] if not report_individuals else ['--report-individuals'])
     elif(platform == 'posix'):
         command = [
             'python3', 'simulation/wormpop.py',
@@ -136,7 +136,7 @@ def run_simulation():
             '--directory=' + directory_name,
             '--variants=' + variants_path,
             '--socket=' + port
-        ] + [] if not report_individuals else ['--report-individuals']
+        ] + ([] if not report_individuals else ['--report-individuals'])
     else:
         print("You did something very wrong!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     

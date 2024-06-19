@@ -27,6 +27,11 @@ function JobViewModel() {
         window.location.href = '/world/index.html?socket=' + job.socket;
     }
 
+    self.viewWorldReplay = (job) => {
+        window.location.href = `/world_replay/index.html?guid=${job.guid}`;
+    }
+
+
     self.deleteJob = function(job) {
         if (confirm(`Are you sure you want to delete job ${job.guid}?`)) {
             fetch(`/api/delete-job/${job.guid}`, {

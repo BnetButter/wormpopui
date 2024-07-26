@@ -1,24 +1,29 @@
 digraph {
 
     layout=neato
-    graph [ nodesep=1 ranksep=1 ] 
+    graph [ nodesep=1 ranksep=1 fontname = "arial" ] 
+    node [fontname = "arial"];
+    edge [fontname = "arial"];
  
-    adult [ label="Adult" fontsize=20 pos="0,8!" id="adult" shape=circle, style=filled, fillcolor="#FF000080"] // Semi-transparent Red
-    egg [  label="Egg" fontsize=20 pos="2,12!" id="egg" shape=circle, style=filled, fillcolor="#FFFF0080"] // Semi-transparent Yellow
-    larva [ label="Larva" fontsize=20 pos="4,8!" id="larva" shape=circle, style=filled, fillcolor="#00FF0080"] // Semi-transparent Green
-    dauer [ label="Dauer" fontsize=20 pos="4,4!" id="dauer" shape=circle, style=filled, fillcolor="#0000FF80"] // Semi-transparent Blue
-    parlad [ label="Parlad" fontsize=20 pos="0,4!" id="parlad" shape=circle, style=filled, fillcolor="#80008080"] // Semi-transparent Purple
+    adult [ label="Adult" fontsize=40 pos="0,8!" id="adult" shape=circle, style=filled, fillcolor="#FF000080"] // Semi-transparent Red
+    egg [  label="Egg" fontsize=40 pos="2,12!" id="egg" shape=circle, style=filled, fillcolor="#FFFF0080"] // Semi-transparent Yellow
+    larva [ label="Larva" fontsize=40 pos="4,8!" id="larva" shape=circle, style=filled, fillcolor="#00FF0080"] // Semi-transparent Green
+    dauer [ label="Dauer" fontsize=40 pos="4,4!" id="dauer" shape=circle, style=filled, fillcolor="#0000FF80"] // Semi-transparent Blue
+    parlad [ label="Parlad" fontsize=40 pos="0,4!" id="parlad" shape=circle, style=filled, fillcolor="#80008080"] // Semi-transparent Purple
 
-    
+    l1 [ label="L1 Arrest" fontsize=40 pos="8,8!" id="l1_arrest" shape=circle, style=filled, fillcolor="#FFA50080"] // Semi-transparent Purple
+
+    invis_l1_a [ label="ASDFSDFSDF" pos="4,8!" ]
+
     invis_egg [ pos="1,10!" shape=plaintext label="" ]
     invis_larva [ pos="3,10!" shape=plaintext label="" ]
     invis_adult [ pos="2,8!" shape=plaintext label="" ]
     invis_dauer [ pos="2,4!" shape=plaintext label="" ]
     invis_parlad [ pos="0,6!" shape=plaintext label="" ]
 
-
     invis_dauer_larva_a [ pos="3,5!" shape=plaintext label=""]
     invis_dauer_larva_b [ pos="3,6!" shape=plaintext label=""]
+
 
         
     invis_larva_dauer_b [ pos="5,6!" shape=plaintext label=""]
@@ -26,7 +31,7 @@ digraph {
 
     adult -> invis_egg [ id="egg_adult" color="#0000FF80"]
 
-    egg_cull [ pos="2,14!" shape=plaintext label=Cull ]
+    egg_cull [ fontsize=30 pos="2,14!" shape=plaintext label=Cull ]
 
     egg -> invis_larva [ id="egg_larva" ]
     larva -> invis_adult [ id="larva_adult" ]
@@ -37,18 +42,23 @@ digraph {
     adult -> invis_parlad [ id="adult_parlad" ]
     parlad -> invis_dauer [ id="parlad_dauer" color="#0000FF80"]
 
-    parlad_starve [ pos="-2,0!" shape=plaintext label=Starve ]
-    parlad_cull [ pos="2,0!" label=Cull shape=plaintext]
+    parlad_starve [ fontsize=30 pos="-2,0!" shape=plaintext label=Starve ]
+    parlad_cull [ fontsize=30 pos="2,0!" label=Cull shape=plaintext]
 
-    dauer_starve [ pos="6,0!" shape=plaintext label=Starve ]
-    larva_starve [ pos="6,6!" shape=plaintext label=Starve ] 
-    larva_cull [  pos="6,10!" shape=plaintext  label=Cull ]
-    dauer_cull [ pos="8,4!" shape=plaintext label=Cull ]
+    dauer_starve [ pos="6,0!"  fontsize=30 shape=plaintext label=Starve ]
+    larva_starve [ pos="6,6!" fontsize=30 shape=plaintext label=Starve ] 
+    larva_cull [  pos="6,10!" fontsize=30 shape=plaintext  label=Cull ]
+    dauer_cull [ pos="8,4!" fontsize=30 shape=plaintext label=Cull ]
 
-    adult_old [ pos="-4,8!" fontsize=16 shape=plaintext label="Old Age" ]
-    adult_starve [pos="-3,6!", label="Starve" shape=plaintext]
-    adult_cull [] [pos="-3,10!" label="Cull" shape=plaintext]
+
+
+    adult_old [ pos="-4,8!" fontsize=30 shape=plaintext label="Old Age" ]
+    adult_starve [pos="-3,6!", fontsize=30 label="Starve" shape=plaintext]
+    adult_cull [pos="-3,10!" fontsize=30 label="Cull" shape=plaintext]
     adult_old_invis [ pos="-2,8!" shape=plaintext label="" ]
+
+    l1_starve [ pos="10,6!" fontsize=30 shape=plaintext label=Starve ] 
+    l1_cull [  pos="10,10!" fontsize=30 shape=plaintext  label=Cull ]
 
     adult -> adult_old[ id="adult_old" ]
     adult -> adult_starve [ id="adult_starve" ]
@@ -64,5 +74,8 @@ digraph {
     dauer -> dauer_cull [ id="dauer_dauerCull" label="" ]
     larva -> larva_starve [ id="larva_larvaStarve" label="" ]
     larva -> larva_cull [ id="larva_larvaCull" label=""]
+
+    l1 -> l1_cull [ id="l1_l1Cull" label="" ]
+    l1 -> l1_starve [ id="l1_l1Starve" label=""]
 
 }

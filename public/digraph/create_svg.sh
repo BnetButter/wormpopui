@@ -1,0 +1,1 @@
+dot -Tsvg init_graph.dot -o init_graph.svg

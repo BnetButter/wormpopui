@@ -43,9 +43,9 @@ function onPageLoad() {
                 "adult_starve",
                 "adult_old",
                 "egg_cull",
-                "parlad_parladCull"
-
-
+                "parlad_parladCull",
+                "l1_l1Cull",
+                "l1_l1Starve",
             ]
             for (const id of edges) {
                 console.log(id)
@@ -133,6 +133,8 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
     const parladNode = getNode("parlad")
     const dauerNode = getNode("dauer")
 
+    const l1Node = getNode("l1_arrest")
+
 
     const egg_larva_edge = getEdge("egg_larva")
     const larva_adult_edge = getEdge("larva_adult")
@@ -157,6 +159,10 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
     const adult_starve = getEdge("adult_starve")
     const egg_cull = getEdge("egg_cull")
     const parlad_cull = getEdge("parlad_parladCull")
+
+    const l1_cull = getEdge("l1_l1Cull")
+    const l1_starve = getEdge("l1_l1Starve")
+
     
     let timestep = 0
 
@@ -221,6 +227,7 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
         setSize(eggNode, "egg", timestep)
         setSize(parladNode, "parlad", timestep)
         setSize(dauerNode, "dauer", timestep)
+        setSize(l1Node, "l1", timestep)
 
         setEdgeSize(egg_larva_edge, "egg_to_larva", timestep)
         setEdgeSize(larva_adult_edge, "larva_to_adult", timestep)
@@ -243,6 +250,9 @@ function manipulateSVG(stageCount, transitionCount, loadTimestep=null) {
         setDeathEdgeSize(adult_starve, "Adult-starvation-ind", timestep)
         setDeathEdgeSize(egg_cull, "Egg-culled-ind", timestep)
         setDeathEdgeSize(parlad_cull, "Parlad-culled-ind", timestep)
+
+        setDeathEdgeSize(l1_cull, "L1Arrest-culled-ind", timestep)
+        setDeathEdgeSize(l1_starve, "L1Arrest-starvation-ind", timestep)
 
         updateTimestep(timestep)
         timestep++
@@ -334,10 +344,11 @@ function parseTSV(tsv) {
         adult: headers.indexOf('Number Adults'),
         parlad: headers.indexOf('Number Parlads'),
         dauer: headers.indexOf('Number Dauer'),
-        egg: headers.indexOf('Number Eggs')
+        egg: headers.indexOf('Number Eggs'),
+        l1: headers.indexOf('Number L1 Arrest'),
     };
 
-    const data = { larva: [], adult: [], parlad: [], dauer: [], egg: [] };
+    const data = { larva: [], adult: [], parlad: [], dauer: [], egg: [], l1: [] };
 
     for (let i = 1; i < lines.length; i++) {
         const row = lines[i].split('\t');
